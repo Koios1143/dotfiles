@@ -1,0 +1,73 @@
+/* ====================================================================
+   YoRHa / NieR:Automata  —  wlogout theme
+   Recreates the in-game SYSTEM menu: beige field, sharp ink borders,
+   dark-fill selection that inverts the glyph (like the "Save" row).
+
+   GTK3 CSS — no var(), no ::before, no filter. Colours via @define-color.
+   Launch with a 3-wide grid:   wlogout -b 3
+   ==================================================================== */
+
+@define-color bg     #c2bba4;   /* field beige            */
+@define-color ink    #454138;   /* lines / text ink       */
+@define-color light  #d8d1bc;   /* inverted foreground    */
+
+* {
+    font-family: "Jost*", "Jost", "Quicksand", "Century Gothic", sans-serif;
+    background-image: none;
+    box-shadow: none;
+    text-shadow: none;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+window {
+    background-color: @bg;
+
+    /* For the authentic dotted-domino frame, drop your screenshot in icons/
+       and uncomment these three lines:*/
+    background-image: image(url("icons/YoRHa_bg1.png"));
+    background-size: cover;
+    background-position: center;
+}
+
+button {
+    color: @ink;
+    background-color: @bg;
+    background-repeat: no-repeat;
+    background-position: center 30%;
+    background-size: 30%;
+
+    border: 1px solid @ink;
+    border-radius: 0;
+    margin: 16px;
+    padding-top: 60px;          /* nudges the label below the glyph; tune to taste */
+
+    font-size: 17px;
+    letter-spacing: 4px;
+    outline: none;
+}
+
+/* --- selection / hover : invert, with a NieR inset double-frame ------- */
+button:focus,
+button:hover,
+button:active {
+    color: @light;
+    background-color: @ink;
+    border-color: @ink;
+    box-shadow: inset 0 0 0 3px @bg, inset 0 0 0 4px @ink;
+}
+
+/* --- glyphs (resting, ink) ------------------------------------------- */
+#lock      { background-image: image(url("icons/lock.svg")); }
+#logout    { background-image: image(url("icons/logout.svg")); }
+#suspend   { background-image: image(url("icons/suspend.svg")); }
+#hibernate { background-image: image(url("icons/hibernate.svg")); }
+#shutdown  { background-image: image(url("icons/shutdown.svg")); }
+#reboot    { background-image: image(url("icons/reboot.svg")); }
+
+/* --- glyphs (selected, inverted light) ------------------------------- */
+#lock:focus,      #lock:hover,      #lock:active      { background-image: image(url("icons/lock-active.svg")); }
+#logout:focus,    #logout:hover,    #logout:active    { background-image: image(url("icons/logout-active.svg")); }
+#suspend:focus,   #suspend:hover,   #suspend:active   { background-image: image(url("icons/suspend-active.svg")); }
+#hibernate:focus, #hibernate:hover, #hibernate:active { background-image: image(url("icons/hibernate-active.svg")); }
+#shutdown:focus,  #shutdown:hover,  #shutdown:active  { background-image: image(url("icons/shutdown-active.svg")); }
+#reboot:focus,    #reboot:hover,    #reboot:active    { background-image: image(url("icons/reboot-active.svg")); }

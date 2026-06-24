@@ -1,0 +1,4 @@
+gtk-theme:    'Adwaita'
+icon-theme:   'Adwaita'
+cursor-theme: 'nier-cursors-bin'
+font-name:    'Adwaita Sans 11'

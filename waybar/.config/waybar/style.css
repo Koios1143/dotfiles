@@ -1,0 +1,51 @@
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(30, 30, 46, 0.85);
+    color: #cdd6f4;
+}
+
+/* 每個模組做成膠囊狀 */
+#workspaces,
+#window,
+#clock,
+#pulseaudio,
+#backlight,
+#network,
+#cpu,
+#custom-gpu,
+#memory,
+#battery,
+#tray {
+    background: #313244;
+    border-radius: 10px;
+    padding: 2px 12px;
+    margin: 4px 2px;
+}
+
+#workspaces button {
+    color: #6c7086;
+    padding: 0 6px;
+    border-radius: 8px;
+}
+
+#workspaces button.active {
+    color: #1e1e2e;
+    background: #89b4fa;
+}
+
+#clock { color: #f9e2af; }
+#pulseaudio { color: #fab387; }
+#backlight { color: #f5c2e7; }
+#network { color: #a6e3a1; }
+#cpu { color: #89dceb; }
+#custom-gpu { color: #a6e3a1; }
+#memory { color: #cba6f7; }
+#battery { color: #94e2d5; }
+
+#battery.warning { color: #f9e2af; }
+#battery.critical { color: #f38ba8; }

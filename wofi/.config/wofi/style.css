@@ -1,0 +1,65 @@
+window {
+    margin: 0px;
+    border: 1px solid #706c58;
+    border-radius: 0px;
+    background-color: rgba(192, 188, 158, 0.97);
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 15px;
+    color: #2a2820;
+}
+
+#outer-box {
+    margin: 0px;
+    border: none;
+}
+
+/* 頂部搜尋框:做成深色橫條,呼應 SDDM 的 topBar */
+#input {
+    margin: 0px;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 0px;
+    background-color: #1a1814;
+    color: #d0cca8;
+    border-bottom: 1px solid #706c58;
+    outline: none;
+}
+
+#input image { color: #d0cca8; }
+
+#inner-box {
+    margin: 6px;
+    border: none;
+}
+
+#scroll {
+    margin: 0px;
+    border: none;
+}
+
+#entry {
+    padding: 8px 12px;
+    border-radius: 0px;
+    border: none;
+    background-color: transparent;
+}
+
+/* 選中項:深色塊 + 左側米白強調條,呼應 NierButton 的 left accent bar */
+#entry:selected {
+    background-color: #3e3c33;
+    border-left: 3px solid #d0cca8;
+}
+
+#entry:selected #text {
+    color: #d0cca8;
+}
+
+#text {
+    color: #2a2820;
+    margin: 0px 10px;
+}
+
+/* 圖示稍微降低存在感,讓它更像終端機清單 */
+#entry image {
+    opacity: 0.85;
+}

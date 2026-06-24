@@ -1,0 +1,144 @@
+/* ─────────────────────────────────────────────
+   swaync — NieR / YoRHa (米色經典款)
+   依 /etc/xdg/swaync/style.css 0.12.6 實際結構覆寫
+   底色源頭: .notification (含 .low/.normal/.critical 變體, 預設 rgba(48,48,48,0.8))
+   ───────────────────────────────────────────── */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 14px;
+}
+
+@define-color bg       #c0bc9e;
+@define-color bg-hover #c8c4a6;
+@define-color bg-cc    #c0bc9e;
+@define-color ink      #2a2820;
+@define-color ink-dim  #4f4a37;
+@define-color frame    #706c58;
+@define-color dark     #201f1a;
+@define-color dark-fg  #d0cca8;
+
+.floating-notifications,
+.blank-window { background: transparent; }
+
+/* 外框 + YoRHa accent bar */
+.notification-row .notification-background {
+    border: 1px solid @frame !important;
+    border-left: 3px solid @frame !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 6px;
+}
+
+/* ★ 卡片填色源頭: 打在 .notification 以及三個 urgency 變體 (覆寫 rgba 半透明深灰) */
+.notification-row .notification-background .notification,
+.notification-row .notification-background .notification.low,
+.notification-row .notification-background .notification.normal,
+.notification-row .notification-background .notification.critical {
+    background: #c0bc9e !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    opacity: 1 !important;
+}
+
+/* 點擊區 / 內容 維持透明, 讓上面的米底透上來 */
+.notification-row .notification-background .notification .notification-default-action,
+.notification-row .notification-background .notification .notification-default-action .notification-content {
+    background: transparent !important;
+    background-image: none !important;
+}
+
+/* avatar / 圖片 */
+.notification-row .notification-background .notification .notification-default-action .notification-content .image {
+    border: 1px solid @frame !important;
+    border-radius: 0 !important;
+    margin-right: 12px;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* ── 文字 (text-box 內) ───────────────────────── */
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box label,
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+    color: @ink !important;
+    text-shadow: none !important;
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+    font-weight: bold;
+    font-size: 1.05em;
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+    color: @ink-dim !important;
+    font-size: 0.82em;
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+    color: @ink-dim !important;
+    font-size: 0.95em;
+}
+
+/* ── action 按鈕 ─────────────────────────────── */
+.notification-row .notification-background .notification .notification-action {
+    background: @dark !important;
+    background-image: none !important;
+    color: @dark-fg !important;
+    border: 1px solid @frame !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 4px 4px 0 0;
+}
+.notification-row .notification-background .notification .notification-action:hover {
+    background: #2c2a24 !important;
+    color: #ffffff !important;
+}
+
+/* close button */
+.notification-row .close-button {
+    background: transparent !important;
+    background-image: none !important;
+    color: @ink !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 2px;
+    padding: 2px 6px;
+}
+.notification-row .close-button:hover {
+    background: @dark !important;
+    color: @dark-fg !important;
+}
+
+/* ── control center ──────────────────────────── */
+.control-center {
+    background: #c0bc9e !important;
+    background-image: none !important;
+    border: 1px solid @frame !important;
+    border-radius: 0 !important;
+}
+.control-center .notification-row .notification-background .notification,
+.control-center .notification-row .notification-background .notification.low,
+.control-center .notification-row .notification-background .notification.normal,
+.control-center .notification-row .notification-background .notification.critical {
+    background: #c0bc9e !important;
+    background-image: none !important;
+    opacity: 1 !important;
+}
+.widget-title { color: @ink !important; font-size: 1.3em; margin: 8px; }
+.widget-title > button {
+    background: @dark !important;
+    background-image: none !important;
+    color: @dark-fg !important;
+    border: 1px solid @frame !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 2px 10px;
+}
+.widget-title > button:hover { background: #2c2a24 !important; }
+
+.widget-dnd { color: @ink !important; margin: 8px; }
+.widget-dnd > switch {
+    background: @dark !important;
+    border: 1px solid @frame !important;
+    border-radius: 0 !important;
+}
+.widget-dnd > switch:checked { background: @frame !important; }

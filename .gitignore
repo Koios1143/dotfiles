@@ -1,0 +1,28 @@
+# ── 絕對不要進 public repo 的東西 ──────────────────────────────
+# SSH / GPG keys
+.ssh/
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+*.gpg
+*.asc
+
+# 各種 token / 認證
+.netrc
+.npmrc
+*.token
+*_token
+*secret*
+*credential*
+.config/gh/hosts.yml
+
+# 環境變數檔
+.env
+.env.*
+
+# ── 雜訊 ──────────────────────────────────────────────────────
+*.bak
+*.swp
+*~
+.DS_Store

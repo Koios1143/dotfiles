@@ -1,0 +1,36 @@
+{
+    "label" : "lock",
+    "action" : "/home/koios/.local/share/quickshell-lockscreen/lock.sh",
+    "text" : "LOCK",
+    "keybind" : "l"
+}
+{
+    "label" : "logout",
+    "action" : "hyprctl dispatch 'hl.dsp.exit()'",
+    "text" : "LOGOUT",
+    "keybind" : "e"
+}
+{
+    "label" : "suspend",
+    "action" : "systemctl suspend",
+    "text" : "SUSPEND",
+    "keybind" : "u"
+}
+{
+    "label" : "hibernate",
+    "action" : "systemctl hibernate",
+    "text" : "HIBERNATE",
+    "keybind" : "h"
+}
+{
+    "label" : "shutdown",
+    "action" : "systemctl poweroff",
+    "text" : "SHUTDOWN",
+    "keybind" : "s"
+}
+{
+    "label" : "reboot",
+    "action" : "systemctl reboot",
+    "text" : "REBOOT",
+    "keybind" : "r"
+}

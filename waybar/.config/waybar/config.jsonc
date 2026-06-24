@@ -1,0 +1,109 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 4,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "backlight", "network", "cpu", "custom/gpu", "memory", "battery", "tray"],
+
+    "hyprland/workspaces": {
+        "on-click": "activate",
+        "format": "{id}"
+    },
+
+    "hyprland/window": {
+        "max-length": 50,
+        "separate-outputs": true
+    },
+
+    "clock": {
+	"format": "{:%H:%M  %m/%d}",
+	"tooltip-format": "<tt>{calendar}</tt>",
+	"calendar": {
+		"mode": "month",
+		"on-scroll": 1,
+		"format": {
+			"months":   "<span color='#f9e2af'><b>{}</b></span>",
+			"days":     "<span color='#cdd6f4'>{}</span>",
+			"weekdays": "<span color='#89b4fa'><b>{}</b></span>",
+			"today":    "<span color='#f38ba8'><b>{}</b></span>"
+		}
+	},
+	"actions": {
+		"on-click-right": "mode",
+ 		"on-scroll-up": "shift_up",
+ 		"on-scroll-down": "shift_down"
+	}
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 muted",
+        "format-icons": { "default": ["󰕿", "󰖀", "󰕾"] },
+        "on-click": "pavucontrol",
+	"on-scroll-up": "swayosd-client --output-volume raise --max-volume 150",
+    	"on-scroll-down": "swayosd-client --output-volume lower --max-volume 150",
+    	"on-click-right": "swayosd-client --output-volume mute-toggle"
+    },
+
+    "backlight": {
+	"format": "{icon} {percent}%",
+	"format-icons": ["󰃞", "󰃟", "󰃠"],
+	"on-scroll-up": "brightnessctl set +5%",
+	"on-scroll-down": "brightnessctl set 5%-",
+	"tooltip": false
+    },
+
+    "network": {
+        "format-wifi": "󰤨 {signalStrength}%",
+        "format-ethernet": "󰈀 wired",
+        "format-disconnected": "󰤭 off",
+        "tooltip-format": "{essid} ({ipaddr})",
+        "on-click": "nm-connection-editor"
+    },
+
+    "cpu": {
+        "format": "󰻠 {usage}%"
+    },
+
+    "custom/gpu": {
+	"format": "󰢮 {}",
+	"exec": "gpu-usage-waybar",
+	"return-type": "json",
+	"on-click": "kitty -e nvtop"
+    },
+
+    "memory": {
+        "format": "󰍛 {percentage}%"
+    },
+
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-icons": ["󰂎", "󰁺", "󰁾", "󰂀", "󰁹"],
+        "states": { "warning": 30, "critical": 15 }
+    },
+
+    "tray": {
+        "spacing": 8
+    },
+
+    "custom/notification": {
+    	"tooltop": false,
+	"format": "{icon}",
+	"format-icons": {
+		"notification": "󱅫",
+        	"none": "󰂚",
+        	"dnd-notification": "󰂛",
+        	"dnd-none": "󰂛"
+	},
+	"return-type": "json",
+	"exec-if": "which swaync-client",
+	"exec": "swaync-cliend -swb",
+	"on-click": "swaync-client -t -sw",
+	"on-click-right": "swaync-client -d -sw",
+	"escapse": true
+    }
+}
