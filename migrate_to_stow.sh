@@ -54,6 +54,8 @@ PACKAGES=(
   ".config/wlogout"
   ".config/zen"
   ".config/Thunar"
+  ".config/quickshell"
+  ".config/qtvirtualkeyboard"
 )
 
 # ---------------------------------------------------------------------------

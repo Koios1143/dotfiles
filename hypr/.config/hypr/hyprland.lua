@@ -367,7 +367,8 @@ hl.bind("Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tee ~/Pictures/screen
 hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grim - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
 
 -- Logout menu
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout"))
+-- hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout"))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p /home/koios/.config/quickshell/powermenu/shell.qml"))
 
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
@@ -409,6 +410,7 @@ hl.window_rule({
 --     no_anim = true,
 -- })
 -- overlayLayerRule:set_enabled(false)
+hl.layer_rule({ match = { namespace = "swaync-notification-window" }, blur = false })
 
 -- Hyprland-run windowrule
 hl.window_rule({

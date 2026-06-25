@@ -30,6 +30,7 @@ gvfs
 htop
 hyprland
 hyprpaper
+imagemagick
 imv
 intel-ucode
 kitty
@@ -51,6 +52,7 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+plymouth
 polkit-kde-agent
 power-profiles-daemon
 qt5-wayland

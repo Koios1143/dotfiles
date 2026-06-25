@@ -3,11 +3,51 @@
       xmlns:bookmark="http://www.freedesktop.org/standards/desktop-bookmarks"
       xmlns:mime="http://www.freedesktop.org/standards/shared-mime-info"
 >
-  <bookmark href="file:///home/koios/Pictures/wallpapers" added="2026-06-24T06:08:24.498855Z" modified="2026-06-24T06:08:24.498857Z" visited="2026-06-24T06:08:24.498856Z">
+  <bookmark href="file:///home/koios/Pictures" added="2026-06-25T07:49:59.808731Z" modified="2026-06-25T07:49:59.808743Z" visited="2026-06-25T07:49:59.808732Z">
     <info>
       <metadata owner="http://freedesktop.org">
         <bookmark:applications>
-          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-24T06:08:24.498856Z" count="1"/>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808739Z" count="1"/>
+        </bookmark:applications>
+        <bookmark:private/>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/koios/Downloads" added="2026-06-25T07:49:59.808746Z" modified="2026-06-25T07:49:59.808753Z" visited="2026-06-25T07:49:59.808746Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808748Z" count="1"/>
+        </bookmark:applications>
+        <bookmark:private/>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/koios/Pictures/wallpapers" added="2026-06-25T07:49:59.808755Z" modified="2026-06-25T07:49:59.808767Z" visited="2026-06-25T07:49:59.808756Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808757Z" count="1"/>
+        </bookmark:applications>
+        <bookmark:private/>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///home/koios" added="2026-06-25T07:49:59.808769Z" modified="2026-06-25T07:49:59.808775Z" visited="2026-06-25T07:49:59.808769Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808771Z" count="1"/>
+        </bookmark:applications>
+        <bookmark:private/>
+      </metadata>
+    </info>
+  </bookmark>
+  <bookmark href="file:///usr/share/plymouth/themes/nier/src" added="2026-06-25T07:49:59.808778Z" modified="2026-06-25T07:49:59.808782Z" visited="2026-06-25T07:49:59.808779Z">
+    <info>
+      <metadata owner="http://freedesktop.org">
+        <bookmark:applications>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808780Z" count="1"/>
         </bookmark:applications>
         <bookmark:private/>
       </metadata>
