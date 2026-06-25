@@ -3,51 +3,51 @@
       xmlns:bookmark="http://www.freedesktop.org/standards/desktop-bookmarks"
       xmlns:mime="http://www.freedesktop.org/standards/shared-mime-info"
 >
-  <bookmark href="file:///home/koios/Pictures" added="2026-06-25T07:49:59.808731Z" modified="2026-06-25T07:49:59.808743Z" visited="2026-06-25T07:49:59.808732Z">
+  <bookmark href="file:///home/koios/Downloads" added="2026-06-25T08:32:31.144819Z" modified="2026-06-25T08:32:31.144828Z" visited="2026-06-25T08:32:31.144819Z">
     <info>
       <metadata owner="http://freedesktop.org">
         <bookmark:applications>
-          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808739Z" count="1"/>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T08:32:31.144828Z" count="2"/>
         </bookmark:applications>
         <bookmark:private/>
       </metadata>
     </info>
   </bookmark>
-  <bookmark href="file:///home/koios/Downloads" added="2026-06-25T07:49:59.808746Z" modified="2026-06-25T07:49:59.808753Z" visited="2026-06-25T07:49:59.808746Z">
+  <bookmark href="file:///home/koios/Pictures" added="2026-06-25T08:32:31.144824Z" modified="2026-06-25T08:32:31.144827Z" visited="2026-06-25T08:32:31.144824Z">
     <info>
       <metadata owner="http://freedesktop.org">
         <bookmark:applications>
-          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808748Z" count="1"/>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T08:32:31.144825Z" count="1"/>
         </bookmark:applications>
         <bookmark:private/>
       </metadata>
     </info>
   </bookmark>
-  <bookmark href="file:///home/koios/Pictures/wallpapers" added="2026-06-25T07:49:59.808755Z" modified="2026-06-25T07:49:59.808767Z" visited="2026-06-25T07:49:59.808756Z">
+  <bookmark href="file:///home/koios/Pictures/wallpapers" added="2026-06-25T08:32:31.144828Z" modified="2026-06-25T08:32:31.144836Z" visited="2026-06-25T08:32:31.144829Z">
     <info>
       <metadata owner="http://freedesktop.org">
         <bookmark:applications>
-          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808757Z" count="1"/>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T08:32:31.144829Z" count="1"/>
         </bookmark:applications>
         <bookmark:private/>
       </metadata>
     </info>
   </bookmark>
-  <bookmark href="file:///home/koios" added="2026-06-25T07:49:59.808769Z" modified="2026-06-25T07:49:59.808775Z" visited="2026-06-25T07:49:59.808769Z">
+  <bookmark href="file:///home/koios" added="2026-06-25T08:32:31.144838Z" modified="2026-06-25T08:32:31.144841Z" visited="2026-06-25T08:32:31.144838Z">
     <info>
       <metadata owner="http://freedesktop.org">
         <bookmark:applications>
-          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808771Z" count="1"/>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T08:32:31.144839Z" count="1"/>
         </bookmark:applications>
         <bookmark:private/>
       </metadata>
     </info>
   </bookmark>
-  <bookmark href="file:///usr/share/plymouth/themes/nier/src" added="2026-06-25T07:49:59.808778Z" modified="2026-06-25T07:49:59.808782Z" visited="2026-06-25T07:49:59.808779Z">
+  <bookmark href="file:///usr/share/plymouth/themes/nier/src" added="2026-06-25T08:32:31.144842Z" modified="2026-06-25T08:32:31.144843Z" visited="2026-06-25T08:32:31.144842Z">
     <info>
       <metadata owner="http://freedesktop.org">
         <bookmark:applications>
-          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T07:49:59.808780Z" count="1"/>
+          <bookmark:application name="gThumb" exec="&apos;org.gnome.gThumb %u&apos;" modified="2026-06-25T08:32:31.144842Z" count="1"/>
         </bookmark:applications>
         <bookmark:private/>
       </metadata>

@@ -100,7 +100,7 @@ ShellRoot {
 
                             Text {
                                 text: row.modelData.icon
-                                font.family: "Symbols Nerd Font"
+				font.family: "Symbols Nerd Font"
                                 font.pixelSize: 24
 				width: 30
 				horizontalAlignment: Text.AlignHCenter
@@ -108,7 +108,9 @@ ShellRoot {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             Text {
-                                text: row.modelData.label
+				text: row.modelData.label
+				font.family: "FOT-Rodin Pro"
+				font.weight: Font.Medium
                                 font.pixelSize: 26
                                 color: root.sel === row.index ? "#d8d1bc" : "#454138"
                                 anchors.verticalCenter: parent.verticalCenter
