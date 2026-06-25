@@ -47,6 +47,7 @@ ntfs-3g
 nvidia-open
 nvidia-utils
 nvtop
+nwg-displays
 pavucontrol
 pipewire
 pipewire-alsa

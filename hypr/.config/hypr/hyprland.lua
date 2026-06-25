@@ -16,7 +16,7 @@
 -- You can (and should!!) split this configuration into multiple files
 -- Create your files separately and then require them like this:
 -- require("myColors")
-
+require("monitors")
 
 ------------------
 ---- MONITORS ----
@@ -29,7 +29,13 @@ hl.monitor({
     position = "auto",
     scale    = 1,
 })
-
+--[[hl.monitor({
+    output = "HDMI-A-1",
+    mode = "1920x1080@60",
+    position = "auto",
+    scale = 1,
+    mirror = "eDP-1"
+})]]--
 
 ---------------------
 ---- MY PROGRAMS ----
