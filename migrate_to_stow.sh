@@ -56,6 +56,7 @@ PACKAGES=(
   ".config/Thunar"
   ".config/quickshell"
   ".config/qtvirtualkeyboard"
+  ".config/qalculate"
 )
 
 # ---------------------------------------------------------------------------

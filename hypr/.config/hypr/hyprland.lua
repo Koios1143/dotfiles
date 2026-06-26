@@ -68,6 +68,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("wl-paste --watch cliphist store")
 	hl.exec_cmd("fcitx5 -d")
 	hl.exec_cmd("swayosd-server")
+	hl.exec_cmd("qs -c nier-launcher")
 end)
 
 -------------------------------
@@ -294,7 +295,8 @@ hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("/home/koios/.local/share/quickshell-lockscreen/lock.sh"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("thunar"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher toggle"))
+hl.bind("ALT + Space", hl.dsp.exec_cmd("rofi -show calc -modi calc -no-show-match -no-sort"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 1 }))
