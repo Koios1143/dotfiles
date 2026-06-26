@@ -62,9 +62,12 @@ Item {
       if (event.button === Qt.LeftButton && root.onLeftClick) root.onLeftClick()
       if (event.button === Qt.MiddleButton && root.onMiddleClick) root.onMiddleClick()
     }
+    // accumulate so touchpads step cleanly; positive = physical "up" = increase
+    property real wheelAccum: 0
     onWheel: wheel => {
-      if (wheel.angleDelta.y > 0 && root.onWheelUp) root.onWheelUp()
-      if (wheel.angleDelta.y < 0 && root.onWheelDown) root.onWheelDown()
+      wheelAccum += Wheel.norm(wheel)
+      while (wheelAccum >= Wheel.step) { wheelAccum -= Wheel.step; if (root.onWheelUp) root.onWheelUp() }
+      while (wheelAccum <= -Wheel.step) { wheelAccum += Wheel.step; if (root.onWheelDown) root.onWheelDown() }
     }
   }
 

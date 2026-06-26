@@ -8,6 +8,9 @@ Row {
   // Keep the bar compact. Increase this if you routinely use more workspaces.
   property int workspaceCount: 5
 
+  // shared across delegates so touchpad scrolling steps cleanly
+  property real wheelAccum: 0
+
   spacing: 5
 
   function isFocused(id) {
@@ -45,10 +48,10 @@ Row {
         onClicked: Hyprland.dispatch("workspace " + wsId)
 
         onWheel: wheel => {
-          if (wheel.angleDelta.y > 0)
-            Hyprland.dispatch("workspace e-1")
-          else if (wheel.angleDelta.y < 0)
-            Hyprland.dispatch("workspace e+1")
+          // physical up => previous workspace, down => next
+          root.wheelAccum += Wheel.norm(wheel)
+          while (root.wheelAccum >= Wheel.step) { root.wheelAccum -= Wheel.step; Hyprland.dispatch("workspace e-1") }
+          while (root.wheelAccum <= -Wheel.step) { root.wheelAccum += Wheel.step; Hyprland.dispatch("workspace e+1") }
         }
       }
     }

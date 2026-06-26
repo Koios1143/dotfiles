@@ -37,6 +37,7 @@ kitty
 libpulse
 linux
 linux-firmware
+mission-center
 mpv
 nano
 network-manager-applet

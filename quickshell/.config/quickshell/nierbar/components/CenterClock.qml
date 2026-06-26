@@ -7,12 +7,19 @@ Item {
   implicitHeight: Theme.barHeight
 
   property date now: new Date()
+  property var onClockClick: null
 
   Timer {
     interval: 1000
     running: true
     repeat: true
     onTriggered: root.now = new Date()
+  }
+
+  MouseArea {
+    anchors.fill: parent
+    cursorShape: Qt.PointingHandCursor
+    onClicked: { if (root.onClockClick) root.onClockClick(root.mapToItem(null, 0, 0).x, root.width) }
   }
 
   Row {

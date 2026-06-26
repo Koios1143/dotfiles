@@ -63,11 +63,12 @@ local fileManager = "thunar"
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
-	hl.exec_cmd("waybar & hyprpaper & mako & nm-applet & swaync & blueman-applet")
+	hl.exec_cmd("hyprpaper & nm-applet & blueman-applet")
 	hl.exec_cmd("wl-paste --watch cliphist store")
 	hl.exec_cmd("fcitx5 -d")
 	hl.exec_cmd("swayosd-server")
 	hl.exec_cmd("qs -c nier-launcher")
+	hl.exec_cmd("qs -c nierbar")
 end)
 
 -------------------------------

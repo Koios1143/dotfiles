@@ -123,3 +123,4 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 source <(fzf --zsh)
+export PATH="$HOME/.local/bin:$PATH"

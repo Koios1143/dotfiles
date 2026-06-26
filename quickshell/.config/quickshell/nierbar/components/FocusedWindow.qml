@@ -7,6 +7,17 @@ Item {
   property string windowClass: ""
   property int maxTitleWidth: 360
 
+  // map the focused window's class to a Nerd Font glyph (browser -> globe, etc.)
+  function appIcon(cls) {
+    const c = (cls || "").toLowerCase()
+    if (/zen|firefox|chrom|brave|browser|web|edge|epiphany/.test(c)) return String.fromCodePoint(0xF059F) // globe
+    if (/kitty|foot|alacritty|wezterm|term|tmux/.test(c)) return String.fromCodePoint(0xF018D)            // console
+    if (/code|cursor|zed|nvim|vim|jetbrains|idea/.test(c)) return String.fromCodePoint(0xF0174)           // code-tags
+    if (/discord|vesktop/.test(c)) return String.fromCodePoint(0xF066F)                                   // discord
+    if (/file|nautilus|dolphin|thunar|nemo/.test(c)) return String.fromCodePoint(0xF024B)                 // folder
+    return "◉"
+  }
+
   implicitWidth: Math.min(maxTitleWidth, row.implicitWidth + 12)
   implicitHeight: Theme.itemHeight
 
@@ -26,10 +37,10 @@ Item {
     spacing: 6
 
     Text {
-      text: "◉"
-      color: Theme.muted
+      text: root.appIcon(root.windowClass)
+      color: Theme.fg
       font.family: Theme.fontFamily
-      font.pixelSize: Theme.tinyText
+      font.pixelSize: Theme.iconText
       anchors.verticalCenter: parent.verticalCenter
     }
 

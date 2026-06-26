@@ -1,6 +1,0 @@
-2026-06-24 14:03:29.565 [info] Started local extension host with pid 31604.
-2026-06-24 14:03:29.599 [info] Started initializing default profile extensions in extensions installation folder. file:///home/koios/.vscode-oss/extensions
-2026-06-24 14:03:29.761 [info] Completed initializing default profile extensions in extensions installation folder. file:///home/koios/.vscode-oss/extensions
-2026-06-24 14:03:30.176 [info] [AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
-2026-06-24 14:03:32.651 [info] [perf] Render performance baseline is 20ms
-2026-06-24 14:03:35.176 [info] [AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
