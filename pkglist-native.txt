@@ -85,7 +85,6 @@ wf-recorder
 wget
 wireplumber
 wl-clipboard
-wofi
 wpa_supplicant
 xdg-desktop-portal-hyprland
 xdg-utils
