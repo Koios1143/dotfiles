@@ -181,10 +181,10 @@
 
   #################################[ os_icon: os identifier ]##################################
   # OS identifier color.
-  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=208
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=255
   typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND=0
   # Custom icon.
-  typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uF31B'
+  typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\U00100000'
 
   ################################[ prompt_char: prompt symbol ]################################
   # Transparent background.
@@ -1704,6 +1704,67 @@
   # can slow down prompt by 1-2 milliseconds, so it's better to keep it turned off unless you
   # really need it.
   typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
+
+  ##############################[ NierBar palette override ]##############################
+  # NieR:Automata / NierBar-inspired recolour: one continuous warm near-black bar,
+  # beige text, sparse burnt-amber accents, muted red only for problems. Truecolor
+  # hex (kitty is truecolor). Kept as one block so it wins over the stock colours
+  # above (delete to revert). Palette:
+  #   bar  #1c1b18  ·  beige #cdc6ad  ·  bright #e6dfc4  ·  amber #c8893c
+  #   dim  #8a8262  ·  red   #b04a3a  ·  sage  #8a8f5c   ·  white #f0ece0
+  # os_icon: warm-white YoRHa emblem
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND='#f0ece0'
+  typeset -g POWERLEVEL9K_OS_ICON_BACKGROUND='#1c1b18'
+  # dir: beige path, brighter anchors, dimmed tail
+  typeset -g POWERLEVEL9K_DIR_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_DIR_FOREGROUND='#cdc6ad'
+  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND='#8a8262'
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND='#e6dfc4'
+  # vcs: beige when clean, amber when dirty, red when conflicted
+  typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND='#cdc6ad'
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='#c8893c'
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='#c8893c'
+  typeset -g POWERLEVEL9K_VCS_CONFLICTED_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_VCS_CONFLICTED_FOREGROUND='#b04a3a'
+  typeset -g POWERLEVEL9K_VCS_LOADING_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_VCS_LOADING_FOREGROUND='#8a8262'
+  # status: silent on success, muted red on error
+  typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND='#8a8262'
+  typeset -g POWERLEVEL9K_STATUS_OK_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE_FOREGROUND='#8a8262'
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND='#b04a3a'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_FOREGROUND='#b04a3a'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_FOREGROUND='#b04a3a'
+  typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_BACKGROUND='#1c1b18'
+  # command execution time: amber figures, like the bar's CPU/GPU readouts
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND='#c8893c'
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND='#1c1b18'
+  # background jobs: amber glyph
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND='#c8893c'
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND='#1c1b18'
+  # context (ssh / root): beige normally, red when root
+  typeset -g POWERLEVEL9K_CONTEXT_FOREGROUND='#cdc6ad'
+  typeset -g POWERLEVEL9K_CONTEXT_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND='#b04a3a'
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_BACKGROUND='#1c1b18'
+  # time: bright beige, like the NierBar clock
+  typeset -g POWERLEVEL9K_TIME_FOREGROUND='#e6dfc4'
+  typeset -g POWERLEVEL9K_TIME_BACKGROUND='#1c1b18'
+  # battery: state shown by foreground hue on the same bar
+  typeset -g POWERLEVEL9K_BATTERY_BACKGROUND='#1c1b18'
+  typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND='#d2674f'
+  typeset -g POWERLEVEL9K_BATTERY_{CHARGING,CHARGED}_FOREGROUND='#8fae6a'
+  typeset -g POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND='#b3a980'
+  # prompt char: amber on success, red on error
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND='#c8893c'
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND='#b04a3a'
+  #########################################################################################
 
   # If p10k is already loaded, reload configuration.
   # This works even with POWERLEVEL9K_DISABLE_HOT_RELOAD=true.
