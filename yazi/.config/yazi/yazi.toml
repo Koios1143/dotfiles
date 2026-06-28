@@ -1,0 +1,13 @@
+[mgr]
+show_hidden = true
+
+[plugin]
+prepend_preloaders = [
+  { mime = "{audio,video,image}/*", run = "mediainfo" },
+]
+prepend_previewers = [
+  { mime = "{audio,video,image}/*", run = "mediainfo" },
+]
+
+[tasks]
+image_alloc = 1073741824
