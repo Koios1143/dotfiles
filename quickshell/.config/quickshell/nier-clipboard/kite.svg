@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="34" height="18" viewBox="0 0 34 18" fill="none">
+  <!-- kite body with hollow ring on the blunt (left) end, long point facing right -->
+  <path d="M2 9 L11 3 L31 9 L11 15 Z M7.2 9 A1.9 1.9 0 1 1 11 9 A1.9 1.9 0 1 1 7.2 9 Z"
+        fill="#34322c" fill-rule="evenodd"/>
+  <!-- two squares above/below the right point -->
+  <rect x="27.6" y="0.4"  width="3.4" height="3.4" fill="#34322c"/>
+  <rect x="27.6" y="14.2" width="3.4" height="3.4" fill="#34322c"/>
+</svg>
