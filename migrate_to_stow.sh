@@ -43,7 +43,6 @@ PACKAGES=(
   ".zshrc"
   ".p10k.zsh"
   ".bashrc"
-  ".config/Code - OSS"
   ".config/fcitx"
   ".config/fcitx5"
   ".config/fontconfig"
@@ -52,11 +51,11 @@ PACKAGES=(
   ".config/pulse"
   ".config/qylock"
   ".config/wlogout"
-  ".config/zen"
   ".config/Thunar"
   ".config/quickshell"
   ".config/qtvirtualkeyboard"
   ".config/qalculate"
+  ".config/yazi"
 )
 
 # ---------------------------------------------------------------------------

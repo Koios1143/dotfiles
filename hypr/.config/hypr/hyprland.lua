@@ -44,6 +44,7 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "kitty"
 local fileManager = "thunar"
+local home = os.getenv("HOME")
 
 
 -------------------
@@ -64,11 +65,15 @@ local fileManager = "thunar"
 hl.on("hyprland.start", function()
 	hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
 	hl.exec_cmd("hyprpaper & nm-applet & blueman-applet")
-	hl.exec_cmd("wl-paste --watch cliphist store")
+	hl.exec_cmd("wl-paste --type text --watch /home/koios/.config/quickshell/nier-clipboard/clip-stamp.sh")
+	hl.exec_cmd("wl-paste --type image --watch /home/koios/.config/quickshell/nier-clipboard/clip-stamp.sh")
 	hl.exec_cmd("fcitx5 -d")
 	hl.exec_cmd("swayosd-server")
-	hl.exec_cmd("qs -c nier-launcher")
+	-- env -u QT_IM_MODULE: use Wayland text-input-v3 so fcitx5 (注音 etc.) works
+	-- in the layer-shell search box; the fcitx5-qt module fails on layer surfaces
+	hl.exec_cmd("env -u QT_IM_MODULE qs -c nier-launcher")
 	hl.exec_cmd("qs -c nierbar")
+	hl.exec_cmd("qs -c nier-clipboard")
 end)
 
 -------------------------------
@@ -292,7 +297,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("/home/koios/.local/share/quickshell-lockscreen/lock.sh"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(home .. "/.local/share/quickshell-lockscreen/lock.sh"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("thunar"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher toggle"))
@@ -369,14 +374,25 @@ hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
 
 -- 框選區域，存檔 + 複製到剪貼簿
-hl.bind("Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
+-- hl.bind("Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
+hl.bind("Print", hl.dsp.exec_cmd("grimblast --freeze copysave area ~Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
 -- 整個螢幕，存檔 + 複製
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grim - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
+-- hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grim - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grimblast --freeze copysave screen ~/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
+
+-- 目前視窗
+hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copy save active ~/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
 -- Logout menu
 -- hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout"))
-hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p /home/koios/.config/quickshell/powermenu/shell.qml"))
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p " .. home .. "/.config/quickshell/powermenu/shell.qml"))
+
+-- color picker
+hl.bind("ALT + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
+
+-- clipboard history
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("qs -c nier-clipboard ipc call clipboard toggle"))
 
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----

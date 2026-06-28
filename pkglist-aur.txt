@@ -1,9 +1,11 @@
 discord_arch_electron
 gpu-usage-waybar-git
+grimblast-git
 hyprshell
 nier-cursors-bin
 paru
 paru-debug
+rustdesk
 sddm-astronaut-theme
 ttf-meslo-nerd-font-powerlevel10k
 wlogout
