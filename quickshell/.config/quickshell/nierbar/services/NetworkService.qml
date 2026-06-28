@@ -10,6 +10,8 @@ Item {
   property bool wifiEnabled: true
   property var networks: []        // [{ ssid, signal, security, inUse }]
   property var savedConnections: []  // names of stored wifi profiles
+  property var ethernets: []       // [{ name, uuid, type, active }]
+  property var vpns: []            // [{ name, uuid, type, active }]  (vpn + wireguard)
   property string activeSsid: ""
   property bool busy: false
   property string status: ""
@@ -28,6 +30,47 @@ Item {
     radioProc.running = true
     listProc.running = true
     savedProc.running = true
+    profProc.running = true
+  }
+
+  // bring a stored profile up / down by uuid. Works for any type (ethernet,
+  // vpn, wireguard); the secret stays in NetworkManager so nothing is forgotten.
+  function activate(name, uuid) {
+    root.busy = true
+    root.status = "Activating " + name + "…"
+    profUpProc.command = ["nmcli", "connection", "up", "uuid", uuid]
+    profUpProc.running = true
+  }
+
+  function deactivate(name, uuid) {
+    root.busy = true
+    root.status = "Deactivating " + name + "…"
+    profDownProc.command = ["nmcli", "connection", "down", "uuid", uuid]
+    profDownProc.running = true
+  }
+
+  // parse `connection show`: NAME may contain ':', so it goes last and is
+  // rejoined; uuid/type/active are colon-free. Splits profiles by type.
+  function parseProfiles(text) {
+    var lines = ("" + text).trim().split("\n").filter(function (l) { return l.length > 0 })
+    var eth = []
+    var vpn = []
+    for (var i = 0; i < lines.length; i++) {
+      var parts = lines[i].split(":")
+      if (parts.length < 4) continue
+      var uuid = parts[0]
+      var type = parts[1]
+      var active = parts[2] === "yes"
+      var name = parts.slice(3).join(":")
+      var entry = ({ name: name, uuid: uuid, type: type, active: active })
+      if (type === "802-3-ethernet") eth.push(entry)
+      else if (type === "vpn" || type === "wireguard") vpn.push(entry)
+    }
+    function byActiveThenName(a, b) { return (b.active - a.active) || a.name.localeCompare(b.name) }
+    eth.sort(byActiveThenName)
+    vpn.sort(byActiveThenName)
+    root.ethernets = eth
+    root.vpns = vpn
   }
 
   function rescan() {
@@ -166,5 +209,30 @@ Item {
   Process {
     id: toggleProc
     onExited: function (code, st) { root.refresh() }
+  }
+
+  Process {
+    id: profProc
+    command: ["nmcli", "-t", "-f", "UUID,TYPE,ACTIVE,NAME", "connection", "show"]
+    stdout: StdioCollector {
+      onStreamFinished: root.parseProfiles(text)
+    }
+  }
+
+  Process {
+    id: profUpProc
+    stderr: StdioCollector { id: profUpErr }
+    onExited: function (code, st) {
+      root.busy = false
+      // vpns that need interactive secrets (OTP, credentials) fail here; surface
+      // the error rather than silently doing nothing.
+      root.status = (code === 0) ? "" : (("" + profUpErr.text).trim() || "Activation failed")
+      root.refresh()
+    }
+  }
+
+  Process {
+    id: profDownProc
+    onExited: function (code, st) { root.busy = false; root.status = ""; root.refresh() }
   }
 }

@@ -76,6 +76,12 @@ if $want_slow; then
     done
   fi
 
+  # active VPN / WireGuard tunnel (independent of the underlying wired/wifi link)
+  vpn="false"
+  if command -v nmcli >/dev/null 2>&1; then
+    nmcli -t -f TYPE connection show --active 2>/dev/null | grep -qE '^(vpn|wireguard)$' && vpn="true"
+  fi
+
   bat_percent="--"; bat_seconds=-1; charging="false"
   if command -v upower >/dev/null 2>&1; then
     dev=$(upower -e 2>/dev/null | grep -m1 battery || true)
@@ -130,13 +136,13 @@ if $want_fast && ! $want_slow; then
     '{volume:$vol, muted:$muted, brightness:$bright, cpu:$cpu, ram:$ram}'
 elif $want_slow && ! $want_fast; then
   jq -nc \
-    --arg gpu "$gpu" --arg network "$network" --argjson wifi_signal "${wifi_signal:-0}" \
+    --arg gpu "$gpu" --arg network "$network" --argjson wifi_signal "${wifi_signal:-0}" --argjson vpn "${vpn:-false}" \
     --arg bat "$bat_percent" --argjson bat_seconds "$bat_seconds" --argjson charging "$charging" \
     --arg bt "$bt" --arg kbd "$kbd" \
-    '{gpu:$gpu, network:$network, wifiSignal:$wifi_signal, battery:$bat, batterySeconds:$bat_seconds, charging:$charging, bluetooth:$bt, keyboard:$kbd}'
+    '{gpu:$gpu, network:$network, wifiSignal:$wifi_signal, vpn:$vpn, battery:$bat, batterySeconds:$bat_seconds, charging:$charging, bluetooth:$bt, keyboard:$kbd}'
 else
   jq -nc \
     --arg vol "$vol" --argjson muted "$muted" --arg bright "$bright" --arg cpu "$cpu" --arg gpu "$gpu" --arg ram "$ram" \
-    --arg network "$network" --argjson wifi_signal "${wifi_signal:-0}" --arg bat "$bat_percent" --argjson bat_seconds "$bat_seconds" --argjson charging "$charging" --arg bt "$bt" --arg kbd "$kbd" \
-    '{volume:$vol, muted:$muted, brightness:$bright, cpu:$cpu, gpu:$gpu, ram:$ram, network:$network, wifiSignal:$wifi_signal, battery:$bat, batterySeconds:$bat_seconds, charging:$charging, bluetooth:$bt, keyboard:$kbd}'
+    --arg network "$network" --argjson wifi_signal "${wifi_signal:-0}" --argjson vpn "${vpn:-false}" --arg bat "$bat_percent" --argjson bat_seconds "$bat_seconds" --argjson charging "$charging" --arg bt "$bt" --arg kbd "$kbd" \
+    '{volume:$vol, muted:$muted, brightness:$bright, cpu:$cpu, gpu:$gpu, ram:$ram, network:$network, wifiSignal:$wifi_signal, vpn:$vpn, battery:$bat, batterySeconds:$bat_seconds, charging:$charging, bluetooth:$bt, keyboard:$kbd}'
 fi

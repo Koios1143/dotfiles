@@ -55,6 +55,18 @@ PanelWindow {
     return "󰤯"
   }
 
+  function profIcon(type) {
+    if (type === "vpn" || type === "wireguard") return "󰖂"
+    if (type === "802-3-ethernet") return "󰈀"
+    return "󰛳"
+  }
+
+  // toggle a stored ethernet/vpn profile on or off
+  function profileClicked(p) {
+    if (p.active) net.deactivate(p.name, p.uuid)
+    else net.activate(p.name, p.uuid)
+  }
+
   NetworkService {
     id: net
     onNeedsPassword: ssid => { if (pop.visible) pop.promptPassword(ssid) }
@@ -141,7 +153,90 @@ PanelWindow {
 
       Rectangle { width: parent.width; height: 1; color: Theme.dim }
 
+      // shared delegate for ethernet/vpn profile rows (click to toggle)
+      Component {
+        id: profileDelegate
+        Rectangle {
+          id: prow
+          required property var modelData
+          width: parent ? parent.width : 0
+          height: 34
+          color: prowMouse.containsMouse ? Theme.bgAlt : "transparent"
+
+          Row {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 6
+            anchors.rightMargin: 6
+            spacing: 8
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              width: 20
+              text: pop.profIcon(prow.modelData.type)
+              color: prow.modelData.active ? Theme.blue : Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.iconText
+            }
+
+            Text {
+              anchors.verticalCenter: parent.verticalCenter
+              width: parent.width - 20 - 8 - 8 - checkText.implicitWidth
+              elide: Text.ElideRight
+              text: prow.modelData.name
+              color: prow.modelData.active ? Theme.blue : Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+
+            Text {
+              id: checkText
+              anchors.verticalCenter: parent.verticalCenter
+              text: prow.modelData.active ? "󰄬" : ""
+              color: Theme.blue
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.iconText
+            }
+          }
+
+          MouseArea {
+            id: prowMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: pop.profileClicked(prow.modelData)
+          }
+        }
+      }
+
+      // ---- ethernet ----
+      Text {
+        visible: net.ethernets.length > 0
+        text: "ETHERNET"
+        color: Theme.muted
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.tinyText
+        font.letterSpacing: 1.5
+      }
+
+      Column {
+        visible: net.ethernets.length > 0
+        width: parent.width
+        spacing: 2
+        Repeater { model: net.ethernets; delegate: profileDelegate }
+      }
+
       // ---- network list ----
+      Text {
+        visible: net.ethernets.length > 0 || net.vpns.length > 0
+        text: "WI-FI"
+        color: Theme.muted
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.tinyText
+        font.letterSpacing: 1.5
+      }
+
       Flickable {
         id: listFlick
         width: parent.width
@@ -222,6 +317,23 @@ PanelWindow {
             font.pixelSize: Theme.smallText
           }
         }
+      }
+
+      // ---- vpn ----
+      Text {
+        visible: net.vpns.length > 0
+        text: "VPN"
+        color: Theme.muted
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.tinyText
+        font.letterSpacing: 1.5
+      }
+
+      Column {
+        visible: net.vpns.length > 0
+        width: parent.width
+        spacing: 2
+        Repeater { model: net.vpns; delegate: profileDelegate }
       }
 
       // ---- inline password entry for secured networks ----

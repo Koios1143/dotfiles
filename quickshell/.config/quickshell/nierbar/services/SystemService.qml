@@ -20,6 +20,7 @@ Item {
   property string ram: "--"
   property string network: "none"
   property int wifiSignal: 0
+  property bool vpn: false
   property string battery: "--"
   property int batterySeconds: -1
   property bool charging: false
@@ -49,6 +50,7 @@ Item {
       gpu = o.gpu ?? "--"
       network = o.network ?? "none"
       wifiSignal = o.wifiSignal ?? 0
+      vpn = o.vpn ?? false
       battery = o.battery ?? "--"
       batterySeconds = o.batterySeconds ?? -1
       charging = o.charging ?? false

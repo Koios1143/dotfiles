@@ -53,6 +53,7 @@ Row {
     return m + "m remaining"
   }
   function networkIcon() {
+    if (sys.vpn) return "󰦝"                  // shield while a VPN tunnel is up
     if (sys.network === "wired") return "󰈀"
     if (sys.network === "wifi") {
       const s = Number(sys.wifiSignal)
@@ -64,11 +65,15 @@ Row {
     }
     return "󰤭"
   }
-  function networkColor() { return sys.network === "none" ? Theme.red : Theme.fg }
+  function networkColor() {
+    if (sys.vpn) return Theme.green          // green = secured tunnel
+    return sys.network === "none" ? Theme.red : Theme.fg
+  }
   function networkTip() {
-    if (sys.network === "wired") return "Wired connected"
-    if (sys.network === "wifi") return "WiFi connected · " + sys.wifiSignal + "%"
-    return "No network"
+    const base = sys.network === "wired" ? "Wired connected"
+               : sys.network === "wifi" ? ("WiFi connected · " + sys.wifiSignal + "%")
+               : "No network"
+    return sys.vpn ? ("VPN active · " + base) : base
   }
   function bluetoothIcon() { return sys.bluetooth === "connected" ? "󰂱" : "󰂯" }
   function bluetoothColor() { return sys.bluetooth === "connected" ? Theme.blue : Theme.fg }
