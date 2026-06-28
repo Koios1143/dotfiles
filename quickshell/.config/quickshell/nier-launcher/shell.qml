@@ -26,17 +26,20 @@ import Quickshell.Io
 Scope {
     id: root
 
-    // ---- theme -------------------------------------------------------------
+    // ---- theme (dark NieR, matches nier-clipboard) -------------------------
     readonly property string face:    "FOT-Rodin Pro"
-    readonly property color  bg:      "#c7c3ab"
-    readonly property color  rowBg:   "#d6d2bf"
-    readonly property color  sel:     "#37352e"
-    readonly property color  selLine: "#26241f"
-    readonly property color  selInk:  "#dad6c1"
-    readonly property color  ink:     "#43413a"
-    readonly property color  muted:   "#6d6a59"
-    readonly property color  rail:    "#9d9a85"
-    readonly property color  accent:  "#b5933f"   // amber | teal #74a89c | red #b0432a
+    readonly property color  bg:        "#1a1813"
+    readonly property color  bg2:       "#131210"
+    readonly property color  rowBg:     "#211e18"
+    readonly property color  sel:       "#2d2920"
+    readonly property color  selLine:   "#d99b45"
+    readonly property color  selInk:    "#ece6da"
+    readonly property color  ink:       "#d7d0c4"
+    readonly property color  muted:     "#8a8377"
+    readonly property color  rail:      "#5b5649"
+    readonly property color  accent:    "#d99b45"
+    readonly property color  frame:     "#5b5649"
+    readonly property color  frameSoft: Qt.rgba(91/255, 86/255, 73/255, 0.55)
 
     // content side inset: the mockup centres a 760px column inside the 800px
     // card (~20px each side) so the left rails breathe away from the border
@@ -236,68 +239,62 @@ Scope {
             width: 800
             height: 556
             anchors.centerIn: parent
-            color: root.bg
-            border.color: "#6f6c5a"
-            border.width: 1
+            color: "transparent"
             MouseArea { anchors.fill: parent }   // absorb clicks on the card
 
-            // mesh grid (6px fine + 24px coarse), inset 5px
+            // octagon panel: dark fill + clipped damage grid + the #5b5649 frame
             Canvas {
                 anchors.fill: parent
-                anchors.margins: 5
+                property int ch: 16
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
                 onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-                    function grid(step, style) {
-                        ctx.strokeStyle = style; ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        for (var x = 0; x <= width;  x += step) { ctx.moveTo(x + 0.5, 0); ctx.lineTo(x + 0.5, height); }
-                        for (var y = 0; y <= height; y += step) { ctx.moveTo(0, y + 0.5); ctx.lineTo(width, y + 0.5); }
-                        ctx.stroke();
+                    var c = getContext("2d"); c.clearRect(0, 0, width, height);
+                    var w = width, h = height, k = ch;
+                    function oct() {
+                        c.beginPath();
+                        c.moveTo(k, 1); c.lineTo(w - k, 1); c.lineTo(w - 1, k);
+                        c.lineTo(w - 1, h - k); c.lineTo(w - k, h - 1); c.lineTo(k, h - 1);
+                        c.lineTo(1, h - k); c.lineTo(1, k); c.closePath();
                     }
-                    grid(6,  "rgba(67,65,58,0.03)");
-                    grid(24, "rgba(67,65,58,0.05)");
+                    var g = c.createLinearGradient(0, 0, 0, h);
+                    g.addColorStop(0, root.bg); g.addColorStop(1, root.bg2);
+                    oct(); c.fillStyle = g; c.fill();
+                    c.save(); oct(); c.clip();
+                    function grid(step, a) {
+                        c.strokeStyle = "rgba(215,208,196," + a + ")"; c.lineWidth = 1; c.beginPath();
+                        for (var x = 0; x <= w; x += step) { c.moveTo(x + 0.5, 0); c.lineTo(x + 0.5, h); }
+                        for (var y = 0; y <= h; y += step) { c.moveTo(0, y + 0.5); c.lineTo(w, y + 0.5); }
+                        c.stroke();
+                    }
+                    grid(6, "0.02"); grid(24, "0.035");
+                    c.restore();
+                    oct(); c.strokeStyle = root.frame; c.lineWidth = 1.5; c.stroke();
                 }
             }
 
-            // inner border
-            Rectangle {
-                anchors.fill: parent; anchors.margins: 5
-                color: "transparent"
-                border.color: Qt.rgba(67/255, 65/255, 58/255, 0.32); border.width: 1
-            }
-
-            // four corner brackets
-            component Corner: Item {
-                width: 11; height: 11
-                property bool rightSide: false
-                property bool bottomSide: false
-                Rectangle { width: 11; height: 1.5; color: Qt.rgba(67/255,65/255,58/255,0.55)
-                            anchors.top: bottomSide ? undefined : parent.top
-                            anchors.bottom: bottomSide ? parent.bottom : undefined }
-                Rectangle { width: 1.5; height: 11; color: Qt.rgba(67/255,65/255,58/255,0.55)
-                            anchors.left:  rightSide ? undefined : parent.left
-                            anchors.right: rightSide ? parent.right : undefined }
-            }
-            Corner { x: 9;  y: 9 }
-            Corner { y: 9;  anchors.right: parent.right; anchors.rightMargin: 9;  rightSide: true }
-            Corner { x: 9;  anchors.bottom: parent.bottom; anchors.bottomMargin: 9; bottomSide: true }
-            Corner { anchors.right: parent.right; anchors.rightMargin: 9
-                     anchors.bottom: parent.bottom; anchors.bottomMargin: 9
-                     rightSide: true; bottomSide: true }
-
             // -------------------------------------------------- header (title)
+            Image {   // YoRHa emblem
+                id: logo
+                source: Qt.resolvedUrl("yorha.svg")
+                x: root.inset; y: 13
+                height: 36; width: 36 * 197/232
+                fillMode: Image.PreserveAspectFit; smooth: true; sourceSize.height: 72
+            }
+            Rectangle {   // divider
+                x: root.inset + 44; y: 15; width: 1; height: 30; color: root.frameSoft
+            }
             Text {   // shadow
-                x: root.inset + 27.5; y: 19.5
+                x: root.inset + 60.5; y: 19.5
                 text: "APPLICATIONS"; font.family: root.face; font.weight: Font.DemiBold
                 font.pixelSize: 23; font.letterSpacing: 1.5
-                color: Qt.rgba(125/255, 118/255, 95/255, 0.5)
+                color: Qt.rgba(0, 0, 0, 0.45)
             }
             Text {   // ink
                 id: title
-                x: root.inset + 26; y: 18
+                x: root.inset + 59; y: 18
                 text: "APPLICATIONS"; font.family: root.face; font.weight: Font.DemiBold
-                font.pixelSize: 23; font.letterSpacing: 1.5; color: "#34322c"
+                font.pixelSize: 23; font.letterSpacing: 1.5; color: root.ink
             }
             Text {   // live count
                 anchors.left: title.right; anchors.leftMargin: 13
@@ -308,14 +305,14 @@ Scope {
             }
 
             // header underline
-            Rectangle { x: root.inset; y: 56; width: card.width - 2 * root.inset; height: 1; color: "#8d8a76" }
+            Rectangle { x: root.inset; y: 56; width: card.width - 2 * root.inset; height: 1; color: root.frameSoft }
 
             // ----------------------------------------------------- search box
             Rectangle {
                 id: searchBox
                 x: root.inset + 46; y: 70
                 width: card.width - 2 * root.inset - 46 - 42; height: 40
-                color: "#bbb79f"; border.color: "#8d8a76"; border.width: 1
+                color: "#23201a"; border.color: root.frameSoft; border.width: 1
 
                 // single caret = the TextInput's own cursor, sitting at the left;
                 // typing flows from it (no second blinking cursor)
@@ -405,7 +402,9 @@ Scope {
                         width: ListView.view ? ListView.view.width : 0
                         // selected row grows by rowPad on each side so its lines
                         // float above/below the coloured block
-                        height: root.rowH + (isSel ? 2 * root.rowPad : 0)
+                        // constant height (reserve the pad whether selected or not) so
+                        // moving the selection never reflows neighbouring rows
+                        height: root.rowH + 2 * root.rowPad
 
                         // floating top & bottom black lines (only when selected)
                         Rectangle { visible: rowRoot.isSel; anchors.top: parent.top
@@ -420,7 +419,7 @@ Scope {
                             width: parent.width; height: root.rowH
                             color: rowRoot.isSel ? root.sel : root.rowBg
                             border.width: rowRoot.isSel ? 0 : 1
-                            border.color: Qt.rgba(67/255, 65/255, 58/255, 0.14)
+                            border.color: Qt.rgba(215/255, 208/255, 196/255, 0.10)
 
                             MouseArea {
                                 anchors.fill: parent; hoverEnabled: true
@@ -496,14 +495,14 @@ Scope {
                     anchors.top: parent.top; anchors.bottom: parent.bottom
                     anchors.topMargin: 14; anchors.bottomMargin: 14
                     Rectangle {
-                        width: parent.width; color: "#6f6c5a"
+                        width: parent.width; color: root.muted
                         height: Math.max(24, sb.height * list.visibleArea.heightRatio)
                         y: list.visibleArea.yPosition * sb.height
                     }
                 }
-                Rectangle { width: 6; height: 6; radius: 3; color: "#6f6c5a"
+                Rectangle { width: 6; height: 6; radius: 3; color: root.muted
                             anchors.right: parent.right; anchors.rightMargin: root.inset + 23; anchors.top: parent.top }
-                Rectangle { width: 6; height: 6; radius: 3; color: "#6f6c5a"
+                Rectangle { width: 6; height: 6; radius: 3; color: root.muted
                             anchors.right: parent.right; anchors.rightMargin: root.inset + 23; anchors.bottom: parent.bottom }
             }
         }
