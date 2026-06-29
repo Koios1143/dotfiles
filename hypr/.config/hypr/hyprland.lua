@@ -119,8 +119,9 @@ hl.config({
         border_size = 2,
 
         col = {
-            active_border   = { colors = {"rgba(33ccffee)", "rgba(00ff99ee)"}, angle = 45 },
-            inactive_border = "rgba(595959aa)",
+            -- NieR palette: active = bone -> amber gradient, inactive = dim
+            active_border   = "rgba(d7d0c4ff)",
+            inactive_border = "rgba(5b5649aa)",
         },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
