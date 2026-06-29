@@ -7,7 +7,10 @@ import "../style"
 // brightness icon. Shares the bar's SystemService (passed in as `sys`).
 PanelWindow {
   id: bp
-  visible: false
+  // `shown` drives the open/close animation; `visible` trails it so the window
+  // stays mapped until the close transition finishes.
+  property bool shown: false
+  visible: shown || cardScale.yScale > 0.001
 
   property var sys
 
@@ -25,10 +28,10 @@ PanelWindow {
   property real anchorX: 0
   property real anchorWidth: 0
 
-  function open() { bp.visible = true; if (sys) sys.refreshFast() }
-  function close() { bp.visible = false }
+  function open() { bp.shown = true; if (sys) sys.refreshFast() }
+  function close() { bp.shown = false }
   function openAt(x, w) { bp.anchorX = x; bp.anchorWidth = w; bp.open() }
-  function toggleAt(x, w) { bp.visible ? bp.close() : bp.openAt(x, w) }
+  function toggleAt(x, w) { bp.shown ? bp.close() : bp.openAt(x, w) }
 
   function brIcon() {
     if (bp.level <= 33) return "󰃞"
@@ -53,6 +56,15 @@ PanelWindow {
     id: card
     anchors.top: parent.top
     anchors.topMargin: Theme.barHeight + 6
+
+    // HUD panel: unfolds downward out of the bar on open, retracts back up on
+    // close (scaled from the top edge so it reads as deploy / pull-back, not a fade).
+    transform: Scale {
+      id: cardScale
+      origin.y: 0
+      yScale: bp.shown ? 1 : 0
+      Behavior on yScale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+    }
     width: 260
     // centred under the icon, clamped to stay on screen
     x: Math.max(Theme.sideMargin,

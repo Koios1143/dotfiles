@@ -35,6 +35,16 @@ PanelWindow {
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     Component.onCompleted: requestPaint()
+
+    // slow glow-breath: the whole HUD frame dims and swells back like a low idle
+    // pulse. Animating opacity (not repainting the Canvas) keeps it cheap.
+    SequentialAnimation on opacity {
+      loops: Animation.Infinite
+      running: true
+      NumberAnimation { from: 0.55; to: 1.0;  duration: 900;  easing.type: Easing.InOutSine }
+      NumberAnimation { from: 1.0;  to: 0.55; duration: 1300; easing.type: Easing.InOutSine }
+    }
+
     onPaint: {
       const ctx = getContext("2d")
       ctx.reset()
@@ -43,7 +53,7 @@ PanelWindow {
       const c = 12     // chamfer (corner cut) length
       const c2 = 5     // small accent tick length
 
-      ctx.strokeStyle = Theme.line
+      ctx.strokeStyle = Theme.fg
       ctx.lineWidth = 1
 
       // main chamfered-rectangle outline
@@ -66,6 +76,33 @@ PanelWindow {
       ctx.moveTo(W - m, H - m - c2);  ctx.lineTo(W - m - c2, H - m)
       ctx.moveTo(m, H - m - c2);      ctx.lineTo(m + c2, H - m)
       ctx.stroke()
+    }
+  }
+
+  // top-right corner status tick that occasionally double-blinks, like a panel
+  // handshake LED. Sits on top of the (breathing) frame tick at that corner.
+  // The frame tick is centred at (W-5.5, 5.5); this overlays it, rotated to "\".
+  Rectangle {
+    id: statusFlash
+    width: 8
+    height: 1.5
+    antialiasing: true
+    rotation: 45
+    transformOrigin: Item.Center
+    color: Theme.fg
+    opacity: 0
+    x: bar.width - 5.5 - width / 2
+    y: 5.5 - height / 2
+
+    SequentialAnimation on opacity {
+      loops: Animation.Infinite
+      running: true
+      PauseAnimation { duration: 5500 }
+      NumberAnimation { to: 1; duration: 60 }
+      NumberAnimation { to: 0; duration: 90 }
+      PauseAnimation { duration: 110 }
+      NumberAnimation { to: 1; duration: 60 }
+      NumberAnimation { to: 0; duration: 130 }
     }
   }
 

@@ -3,7 +3,7 @@ import QtQuick
 
 QtObject {
   readonly property string fontFamily: "JetBrainsMono Nerd Font"
-  readonly property int barHeight: 46
+  readonly property int barHeight: 52
   readonly property int sideMargin: 14
   readonly property int tinyText: 10
   readonly property int smallText: 11

@@ -8,7 +8,10 @@ import "../services"
 // transparent overlay (click-away to dismiss), same pattern as powermenu.
 PanelWindow {
   id: pop
-  visible: false
+  // `shown` drives the open/close animation; `visible` trails it so the window
+  // stays mapped until the close transition finishes.
+  property bool shown: false
+  visible: shown || cardScale.yScale > 0.001
 
   WlrLayershell.layer: WlrLayer.Overlay
   // OnDemand so the popup only grabs the keyboard once the password field asks.
@@ -24,11 +27,11 @@ PanelWindow {
   property real anchorX: 0
   property real anchorWidth: 0
 
-  function open() { pop.visible = true; net.refresh(); net.rescan() }
-  function close() { pop.visible = false; pop.pendingSsid = ""; pwField.text = "" }
-  function toggle() { pop.visible ? pop.close() : pop.open() }
+  function open() { pop.shown = true; net.refresh(); net.rescan() }
+  function close() { pop.shown = false; pop.pendingSsid = ""; pwField.text = "" }
+  function toggle() { pop.shown ? pop.close() : pop.open() }
   function openAt(x, w) { pop.anchorX = x; pop.anchorWidth = w; pop.open() }
-  function toggleAt(x, w) { pop.visible ? pop.close() : pop.openAt(x, w) }
+  function toggleAt(x, w) { pop.shown ? pop.close() : pop.openAt(x, w) }
 
   function promptPassword(ssid) {
     pop.pendingSsid = ssid
@@ -69,7 +72,7 @@ PanelWindow {
 
   NetworkService {
     id: net
-    onNeedsPassword: ssid => { if (pop.visible) pop.promptPassword(ssid) }
+    onNeedsPassword: ssid => { if (pop.shown) pop.promptPassword(ssid) }
   }
 
   // click anywhere outside the card to close
@@ -82,6 +85,15 @@ PanelWindow {
     id: card
     anchors.top: parent.top
     anchors.topMargin: Theme.barHeight + 6
+
+    // HUD panel: unfolds downward out of the bar on open, retracts back up on
+    // close (scaled from the top edge so it reads as deploy / pull-back, not a fade).
+    transform: Scale {
+      id: cardScale
+      origin.y: 0
+      yScale: pop.shown ? 1 : 0
+      Behavior on yScale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+    }
     width: 320
     // centred under the icon, clamped to stay on screen
     x: Math.max(Theme.sideMargin,

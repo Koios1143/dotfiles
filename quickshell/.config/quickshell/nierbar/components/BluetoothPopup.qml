@@ -8,7 +8,10 @@ import "../services"
 // connect/disconnect. Opened directly below the bar's bluetooth icon.
 PanelWindow {
   id: pop
-  visible: false
+  // `shown` drives the open/close animation; `visible` trails it so the window
+  // stays mapped until the close transition finishes.
+  property bool shown: false
+  visible: shown || cardScale.yScale > 0.001
 
   WlrLayershell.layer: WlrLayer.Overlay
   WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -21,10 +24,10 @@ PanelWindow {
   property real anchorX: 0
   property real anchorWidth: 0
 
-  function open() { pop.visible = true; bt.refresh() }
-  function close() { pop.visible = false; bt.stopScan() }
+  function open() { pop.shown = true; bt.refresh() }
+  function close() { pop.shown = false; bt.stopScan() }
   function openAt(x, w) { pop.anchorX = x; pop.anchorWidth = w; pop.open() }
-  function toggleAt(x, w) { pop.visible ? pop.close() : pop.openAt(x, w) }
+  function toggleAt(x, w) { pop.shown ? pop.close() : pop.openAt(x, w) }
 
   BluetoothService { id: bt }
 
@@ -37,6 +40,15 @@ PanelWindow {
     id: card
     anchors.top: parent.top
     anchors.topMargin: Theme.barHeight + 6
+
+    // HUD panel: unfolds downward out of the bar on open, retracts back up on
+    // close (scaled from the top edge so it reads as deploy / pull-back, not a fade).
+    transform: Scale {
+      id: cardScale
+      origin.y: 0
+      yScale: pop.shown ? 1 : 0
+      Behavior on yScale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+    }
     width: 300
     x: Math.max(Theme.sideMargin,
          Math.min(parent.width - width - Theme.sideMargin,

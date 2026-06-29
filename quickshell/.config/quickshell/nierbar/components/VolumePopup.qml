@@ -8,7 +8,11 @@ import "../services"
 // Shares the bar's SystemService (passed in as `sys`) so state stays in sync.
 PanelWindow {
   id: vp
-  visible: false
+  // `shown` drives the open/close animation; `visible` trails it so the window
+  // stays mapped until the close transition finishes (a PanelWindow that hides
+  // instantly would cut the animation off).
+  property bool shown: false
+  visible: shown || cardScale.yScale > 0.001
 
   property var sys
 
@@ -26,11 +30,11 @@ PanelWindow {
   property real anchorX: 0
   property real anchorWidth: 0
 
-  function open() { vp.visible = true; audio.refresh(); if (sys) sys.refreshFast() }
-  function close() { vp.visible = false }
-  function toggle() { vp.visible ? vp.close() : vp.open() }
+  function open() { vp.shown = true; audio.refresh(); if (sys) sys.refreshFast() }
+  function close() { vp.shown = false }
+  function toggle() { vp.shown ? vp.close() : vp.open() }
   function openAt(x, w) { vp.anchorX = x; vp.anchorWidth = w; vp.open() }
-  function toggleAt(x, w) { vp.visible ? vp.close() : vp.openAt(x, w) }
+  function toggleAt(x, w) { vp.shown ? vp.close() : vp.openAt(x, w) }
 
   function maxVol() { return sys ? sys.maxVolume : 100 }
   function volIcon() {
@@ -60,6 +64,15 @@ PanelWindow {
     id: card
     anchors.top: parent.top
     anchors.topMargin: Theme.barHeight + 6
+
+    // HUD panel: unfolds downward out of the bar on open, retracts back up on
+    // close (scaled from the top edge so it reads as deploy / pull-back, not a fade).
+    transform: Scale {
+      id: cardScale
+      origin.y: 0
+      yScale: vp.shown ? 1 : 0
+      Behavior on yScale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+    }
     width: 300
     // centred under the icon, clamped to stay on screen
     x: Math.max(Theme.sideMargin,
