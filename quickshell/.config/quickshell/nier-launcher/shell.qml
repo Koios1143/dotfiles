@@ -155,7 +155,7 @@ Scope {
         list.positionViewAtBeginning();
         root.armed = false;            // skip the open-transition focus change
         armTimer.restart();
-        win.visible = true;
+        win.visible = true;            // becoming visible replays the intro (see onVisibleChanged)
         grab.active = true;            // arm focus-loss dismissal
         Qt.callLater(function () { search.forceActiveFocus(); });
     }
@@ -213,6 +213,8 @@ Scope {
         id: win
         visible: false                 // resident: start hidden, toggled via IPC
         color: "transparent"
+        // replay the open animations every time the window becomes visible
+        onVisibleChanged: if (visible) card.playIntro()
         anchors { top: true; bottom: true; left: true; right: true }
         exclusiveZone: 0
         WlrLayershell.layer: WlrLayer.Overlay
@@ -242,12 +244,66 @@ Scope {
             color: "transparent"
             MouseArea { anchors.fill: parent }   // absorb clicks on the card
 
+            // ---- open-intro state (re-played on every show()) --------------
+            property real intro: 0                       // octagon frame draw-on
+            readonly property real lineProg:             // straight lines, slight delay
+                Math.max(0, Math.min(1, (intro - 0.2) / 0.8))
+            property real railIn: 0                      // left axis slide-in (0 = off-left)
+            property real kiteFade: 0                    // kite arrow fade-in
+            property string titleText: "APPLICATIONS"    // decoded title (reveals L->R)
+            property real titleDecode: 0                 // animated 0->len, drives lock progression
+            property int titleLocked: 0                  // chars settled so far (= floor(titleDecode))
+
+            NumberAnimation { id: introAnim; target: card; property: "intro"
+                              from: 0; to: 1; duration: 480; easing.type: Easing.OutCubic }
+            NumberAnimation { id: railAnim;  target: card; property: "railIn"
+                              from: 0; to: 1; duration: 400; easing.type: Easing.OutCubic }
+            SequentialAnimation {
+                id: kiteAnim
+                PauseAnimation { duration: 150 }         // let the axis arrive first
+                NumberAnimation { target: card; property: "kiteFade"
+                                  from: 0; to: 1; duration: 260; easing.type: Easing.OutCubic }
+            }
+
+            // title decode: a single flickering cursor walks left->right. Chars
+            // behind it are locked to APPLICATIONS, chars ahead aren't shown yet.
+            // Everything is driven off this one animation (titleDecode 0->len): it's
+            // paced by the frame clock, so both the reveal AND the flicker advance by
+            // real elapsed time and stay even even while the open animations hog the
+            // event loop. (A plain Timer gets starved during the intro and snaps.)
+            readonly property string glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+            NumberAnimation {
+                id: decodeAnim; target: card; property: "titleDecode"
+                from: 0; to: 12; duration: 780; easing.type: Easing.Linear
+            }
+            onTitleDecodeChanged: {
+                var full = "APPLICATIONS";
+                card.titleLocked = Math.min(full.length, Math.floor(card.titleDecode));
+                if (card.titleLocked >= full.length) {
+                    card.titleText = full;                 // fully decoded
+                } else {
+                    // locked prefix + one flickering random A-Z / a-z / 0-9 glyph;
+                    // fires once per frame, so the active char shimmers smoothly
+                    var g = card.glyphs[Math.floor(Math.random() * card.glyphs.length)];
+                    card.titleText = full.substring(0, card.titleLocked) + g;
+                }
+            }
+
+            function playIntro() {
+                card.intro = 0; card.railIn = 0; card.kiteFade = 0;
+                introAnim.restart(); railAnim.restart(); kiteAnim.restart();
+                card.titleDecode = 0; card.titleLocked = 0; card.titleText = "";
+                decodeAnim.restart();
+            }
+
             // octagon panel: dark fill + clipped damage grid + the #5b5649 frame
             Canvas {
                 anchors.fill: parent
                 property int ch: 16
+                property real prog: card.intro          // frame draw-on progress
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
+                onProgChanged: requestPaint()
                 onPaint: {
                     var c = getContext("2d"); c.clearRect(0, 0, width, height);
                     var w = width, h = height, k = ch;
@@ -269,31 +325,53 @@ Scope {
                     }
                     grid(6, "0.02"); grid(24, "0.035");
                     c.restore();
+                    // frame draws on: reveal a single growing dash from the start point
+                    var per = 2 * (w - 2 * k) + 2 * (h - 2 * k) + 4 * (k - 1) * Math.SQRT2;
+                    c.setLineDash([per * prog, per + 2]);
                     oct(); c.strokeStyle = root.frame; c.lineWidth = 1.5; c.stroke();
+                    c.setLineDash([]);
                 }
             }
 
             // -------------------------------------------------- header (title)
-            Image {   // YoRHa emblem
+            Item {   // YoRHa emblem: manual sprite-sheet loop (we drive the wrap, so no AnimatedSprite blank flicker)
                 id: logo
-                source: Qt.resolvedUrl("yorha.svg")
-                x: root.inset; y: 13
-                height: 36; width: 36 * 197/232
-                fillMode: Image.PreserveAspectFit; smooth: true; sourceSize.height: 72
+                x: root.inset + 4; y: 10
+                height: 42; width: height * 46/72
+                clip: true
+                property int frame: 0
+                readonly property int cols: 7        // yorha_anim.png is a 7x49 grid of 46x72 cells (343 frames)
+                readonly property int rows: 49
+                readonly property int frames: 343
+                readonly property int step: 2        // advance 2 frames/tick: real 30fps motion at only 15 repaints/sec
+                Image {                              // atlas decoded once; translated under the clip to show one cell
+                    source: Qt.resolvedUrl("yorha_anim.png")
+                    sourceSize: Qt.size(322, 3528)
+                    width: logo.width * logo.cols; height: logo.height * logo.rows
+                    x: -(logo.frame % logo.cols) * logo.width
+                    y: -Math.floor(logo.frame / logo.cols) * logo.height
+                    smooth: true
+                }
+                // Each repaint redraws the whole overlay, so CPU scales with the tick rate, not the motion speed.
+                // 15 ticks/sec ~3% of one core (only while open; 0 when hidden); step keeps the motion at full 30fps speed.
+                Timer {
+                    interval: 1000 / 15; repeat: true; running: win.visible
+                    onTriggered: logo.frame = (logo.frame + logo.step) % logo.frames
+                }
             }
             Rectangle {   // divider
-                x: root.inset + 44; y: 15; width: 1; height: 30; color: root.frameSoft
+                x: root.inset + 44; y: 15; width: 1; height: 30 * card.lineProg; color: root.frameSoft
             }
             Text {   // shadow
                 x: root.inset + 60.5; y: 19.5
-                text: "APPLICATIONS"; font.family: root.face; font.weight: Font.DemiBold
+                text: card.titleText; font.family: root.face; font.weight: Font.DemiBold
                 font.pixelSize: 23; font.letterSpacing: 1.5
                 color: Qt.rgba(0, 0, 0, 0.45)
             }
             Text {   // ink
                 id: title
                 x: root.inset + 59; y: 18
-                text: "APPLICATIONS"; font.family: root.face; font.weight: Font.DemiBold
+                text: card.titleText; font.family: root.face; font.weight: Font.DemiBold
                 font.pixelSize: 23; font.letterSpacing: 1.5; color: root.ink
             }
             Text {   // live count
@@ -305,7 +383,7 @@ Scope {
             }
 
             // header underline
-            Rectangle { x: root.inset; y: 56; width: card.width - 2 * root.inset; height: 1; color: root.frameSoft }
+            Rectangle { x: root.inset; y: 56; width: (card.width - 2 * root.inset) * card.lineProg; height: 1; color: root.frameSoft }
 
             // ----------------------------------------------------- search box
             Rectangle {
@@ -357,19 +435,20 @@ Scope {
             // ----------------------------------------------------- list region
             Item {
                 id: listRegion
+                clip: true                         // axis rails slide in from the left edge
                 anchors.left: parent.left; anchors.right: parent.right
                 anchors.top: searchBox.bottom; anchors.topMargin: 12
                 anchors.bottom: parent.bottom; anchors.bottomMargin: 26
 
                 // top / bottom rules
-                Rectangle { x: root.inset + 46; width: parent.width - 2 * root.inset - 88; height: 1; color: root.rail; anchors.top: parent.top }
-                Rectangle { x: root.inset + 46; width: parent.width - 2 * root.inset - 88; height: 1; color: root.rail; anchors.bottom: parent.bottom }
+                Rectangle { x: root.inset + 46; width: (parent.width - 2 * root.inset - 88) * card.lineProg; height: 1; color: root.rail; anchors.top: parent.top }
+                Rectangle { x: root.inset + 46; width: (parent.width - 2 * root.inset - 88) * card.lineProg; height: 1; color: root.rail; anchors.bottom: parent.bottom }
 
-                // left rails (thick + thin) — the cursor bar
-                Rectangle { x: root.inset + 8;  width: 8; color: root.rail
+                // left rails (thick + thin) — the kite's fixed axis; slides in from the left
+                Rectangle { x: (root.inset + 8)  - (1 - card.railIn) * 70; width: 8; color: root.rail
                             anchors.top: parent.top; anchors.bottom: parent.bottom
                             anchors.topMargin: 4; anchors.bottomMargin: 4 }
-                Rectangle { x: root.inset + 23; width: 2; color: root.rail
+                Rectangle { x: (root.inset + 23) - (1 - card.railIn) * 70; width: 2; color: root.rail
                             anchors.top: parent.top; anchors.bottom: parent.bottom
                             anchors.topMargin: 4; anchors.bottomMargin: 4 }
 
@@ -393,6 +472,16 @@ Scope {
                     }
                     onCurrentIndexChanged: Qt.callLater(ensureVisible)
                     onCountChanged: if (currentIndex >= count) currentIndex = Math.max(0, count - 1)
+
+                    // mouse-wheel scrolling (row MouseAreas would otherwise swallow it)
+                    WheelHandler {
+                        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                        property real speed: 0.6      // <1 = slower scrolling
+                        onWheel: function (event) {
+                            const max = Math.max(0, list.contentHeight - list.height);
+                            list.contentY = Math.max(0, Math.min(max, list.contentY - event.angleDelta.y * speed));
+                        }
+                    }
 
                     delegate: Item {
                         id: rowRoot
@@ -474,6 +563,7 @@ Scope {
                     id: kite
                     source: Qt.resolvedUrl("kite.svg")
                     width: 34; height: 18; smooth: true
+                    opacity: card.kiteFade              // fades in once the axis has slid in
                     // ring (local x~9) lands in the gap between thick rail
                     // (inset+8..16) and thin rail (inset+23) so neither bisects it
                     x: root.inset + 10
