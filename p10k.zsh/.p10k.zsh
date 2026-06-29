@@ -1760,7 +1760,9 @@
   typeset -g POWERLEVEL9K_BATTERY_BACKGROUND='#1c1b18'
   typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND='#d2674f'
   typeset -g POWERLEVEL9K_BATTERY_{CHARGING,CHARGED}_FOREGROUND='#8fae6a'
-  typeset -g POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND='#b3a980'
+  # p10k maps both "plugged but full (Not charging)" and "on battery" to DISCONNECTED;
+  # keep it green too so the battery reads green whenever it's not low (LOW stays red)
+  typeset -g POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND='#8fae6a'
   # prompt char: amber on success, red on error
   typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND='#c8893c'
   typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND='#b04a3a'
