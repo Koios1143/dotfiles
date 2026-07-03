@@ -36,13 +36,12 @@ PACKAGES=(
   ".config/hypr"
   ".config/waybar"
   ".config/swaync"
-  ".config/wofi"
   ".config/mpv"
-  ".config/imv"
   ".config/kitty"
   ".zshrc"
   ".p10k.zsh"
   ".bashrc"
+  ".vimrc"
   ".config/fcitx"
   ".config/fcitx5"
   ".config/fontconfig"
@@ -56,6 +55,7 @@ PACKAGES=(
   ".config/qtvirtualkeyboard"
   ".config/qalculate"
   ".config/yazi"
+  ".config/fastfetch"
 )
 
 # ---------------------------------------------------------------------------
