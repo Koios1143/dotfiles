@@ -337,16 +337,16 @@ Scope {
             Item {   // YoRHa emblem: manual sprite-sheet loop (we drive the wrap, so no AnimatedSprite blank flicker)
                 id: logo
                 x: root.inset + 4; y: 10
-                height: 42; width: height * 46/72
+                height: 42; width: height * 58/72
                 clip: true
                 property int frame: 0
-                readonly property int cols: 7        // yorha_anim.png is a 7x49 grid of 46x72 cells (343 frames)
+                readonly property int cols: 7        // yorha_anim.png is a 7x49 grid of 58x72 cells (343 frames)
                 readonly property int rows: 49
                 readonly property int frames: 343
                 readonly property int step: 2        // advance 2 frames/tick: real 30fps motion at only 15 repaints/sec
                 Image {                              // atlas decoded once; translated under the clip to show one cell
                     source: Qt.resolvedUrl("yorha_anim.png")
-                    sourceSize: Qt.size(322, 3528)
+                    sourceSize: Qt.size(406, 3528)
                     width: logo.width * logo.cols; height: logo.height * logo.rows
                     x: -(logo.frame % logo.cols) * logo.width
                     y: -Math.floor(logo.frame / logo.cols) * logo.height
