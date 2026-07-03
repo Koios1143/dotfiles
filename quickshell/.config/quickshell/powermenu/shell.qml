@@ -22,7 +22,7 @@ ShellRoot {
 
         // ---- Options (desc drives the footer message; edit freely) ----
         property var items: [
-            { icon: "\uf023", label: "Lock",      desc: "Lock the session",            cmd: "/home/koios/.local/share/quickshell-lockscreen/lock.sh" },
+            { icon: "\uf023", label: "Lock",      desc: "Lock the session",            cmd: "/home/koios/.config/quickshell/nier-lock/quickshell-lockscreen/lock.sh" },
             { icon: "\uf2f5", label: "Logout",    desc: "End the session and log out",  cmd: "hyprctl dispatch 'hl.dsp.exit()'" },
             { icon: "\uf186", label: "Suspend",   desc: "Sleep, keeping state in RAM",  cmd: "systemctl suspend" },
             { icon: "\uf2dc", label: "Hibernate", desc: "Save state to disk and stop",  cmd: "systemctl hibernate" },
