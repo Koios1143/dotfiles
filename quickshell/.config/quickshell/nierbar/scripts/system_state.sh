@@ -3,19 +3,23 @@ set -euo pipefail
 
 # Polled by SystemService.qml. Takes a mode so the bar can refresh cheap,
 # fast-changing values often and expensive/slow ones rarely:
-#   fast -> volume, brightness, cpu, ram
+#   fast -> cpu, ram
 #   slow -> gpu, network, battery, bluetooth, keyboard
-#   all  -> everything (default; handy for debugging)
+#   all  -> everything, including volume/brightness (default; handy for debugging)
+#
+# Note: volume/mute (PipeWire) and brightness (backlight udev events) are now
+# event-driven in SystemService.qml, so the fast lane no longer computes them.
+# They are still emitted in "all" mode for standalone debugging of this script.
 mode="${1:-all}"
-want_fast=false; want_slow=false
+want_fast=false; want_slow=false; want_va=false
 case "$mode" in
   fast) want_fast=true ;;
   slow) want_slow=true ;;
-  *)    want_fast=true; want_slow=true ;;
+  *)    want_fast=true; want_slow=true; want_va=true ;;
 esac
 
-# ---------------- fast lane ----------------
-if $want_fast; then
+# ---------------- volume/brightness (debug/"all" mode only) ----------------
+if $want_va; then
   vol="--"; muted="false"
   if command -v wpctl >/dev/null 2>&1; then
     line=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true)
@@ -24,11 +28,15 @@ if $want_fast; then
     grep -qi MUTED <<<"$line" && muted="true"
   fi
 
+  # Linear scale, to match the keyboard binds and SystemService.qml.
   bright="--"
   if command -v brightnessctl >/dev/null 2>&1; then
     bright=$(brightnessctl -m 2>/dev/null | awk -F, '{gsub(/%/,"",$4); print $4; exit}' || echo "--")
   fi
+fi
 
+# ---------------- fast lane ----------------
+if $want_fast; then
   cpu="--"
   if [[ -r /proc/stat ]]; then
     read -r _ u n s i io irq sirq steal _ < /proc/stat
@@ -132,8 +140,8 @@ fi
 # ---------------- emit ----------------
 if $want_fast && ! $want_slow; then
   jq -nc \
-    --arg vol "$vol" --argjson muted "$muted" --arg bright "$bright" --arg cpu "$cpu" --arg ram "$ram" \
-    '{volume:$vol, muted:$muted, brightness:$bright, cpu:$cpu, ram:$ram}'
+    --arg cpu "$cpu" --arg ram "$ram" \
+    '{cpu:$cpu, ram:$ram}'
 elif $want_slow && ! $want_fast; then
   jq -nc \
     --arg gpu "$gpu" --arg network "$network" --argjson wifi_signal "${wifi_signal:-0}" --argjson vpn "${vpn:-false}" \

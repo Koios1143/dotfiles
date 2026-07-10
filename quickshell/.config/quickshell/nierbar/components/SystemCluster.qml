@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../style"
+import "../services"
 
 Row {
   id: root
@@ -10,6 +11,9 @@ Row {
   property var onBrightnessClick: null
   property var onBluetoothClick: null
   spacing: Theme.compactGap
+
+  // non-visual: Row skips invisible children, so it stays out of the layout
+  PowerProfileService { id: power; visible: false }
 
   function pct(v) { return v === "--" ? "--" : v + "%" }
   function volumeIcon() {
@@ -75,6 +79,26 @@ Row {
                : "No network"
     return sys.vpn ? ("VPN active · " + base) : base
   }
+  function powerIcon() {
+    switch (power.active) {
+      case "performance": return String.fromCodePoint(0xF04C5)  // speedometer
+      case "power-saver": return String.fromCodePoint(0xF032A)  // leaf
+      default:            return String.fromCodePoint(0xF05D1)  // scale-balance (balanced)
+    }
+  }
+  function powerColor() {
+    switch (power.active) {
+      case "performance": return Theme.amber
+      case "power-saver": return Theme.green
+      default:            return Theme.fg
+    }
+  }
+  function powerTip() {
+    const n = power.active === "performance" ? "Performance"
+            : power.active === "power-saver" ? "Power Saver"
+            : power.active === "balanced" ? "Balanced" : "…"
+    return "Power profile: " + n + " · click to cycle"
+  }
   function bluetoothIcon() { return sys.bluetooth === "connected" ? "󰂱" : "󰂯" }
   function bluetoothColor() { return sys.bluetooth === "connected" ? Theme.blue : Theme.fg }
   function bluetoothTip() {
@@ -135,6 +159,19 @@ Row {
     minWidth: 52
     tooltip: root.pct(sys.battery) + " · " + root.batteryTime()
     onLeftClick: () => Quickshell.execDetached(["sh", "-c", "gnome-control-center power || powerprofilesctl get || true"])
+  }
+
+  Divider {}
+
+  StatusItem {
+    id: powerItem
+    icon: root.powerIcon()
+    label: ""
+    fg: root.powerColor()
+    tooltip: root.powerTip()
+    compact: true
+    minWidth: 24
+    onLeftClick: () => power.cycle()
   }
 
   Divider {}

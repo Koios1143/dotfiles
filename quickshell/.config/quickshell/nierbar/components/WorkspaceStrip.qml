@@ -45,13 +45,15 @@ Row {
         hoverEnabled: false
         acceptedButtons: Qt.LeftButton
 
-        onClicked: Hyprland.dispatch("workspace " + wsId)
+        // This Hyprland build evaluates dispatch requests as Lua (see hyprland.lua),
+        // so send the Lua dispatcher call itself, not the plain "workspace N" string.
+        onClicked: Hyprland.dispatch("hl.dsp.focus({ workspace = " + wsId + " })")
 
         onWheel: wheel => {
           // physical up => previous workspace, down => next
           root.wheelAccum += Wheel.norm(wheel)
-          while (root.wheelAccum >= Wheel.step) { root.wheelAccum -= Wheel.step; Hyprland.dispatch("workspace e-1") }
-          while (root.wheelAccum <= -Wheel.step) { root.wheelAccum += Wheel.step; Hyprland.dispatch("workspace e+1") }
+          while (root.wheelAccum >= Wheel.step) { root.wheelAccum -= Wheel.step; Hyprland.dispatch('hl.dsp.focus({ workspace = "e-1" })') }
+          while (root.wheelAccum <= -Wheel.step) { root.wheelAccum += Wheel.step; Hyprland.dispatch('hl.dsp.focus({ workspace = "e+1" })') }
         }
       }
     }
