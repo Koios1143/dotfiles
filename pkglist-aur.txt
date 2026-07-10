@@ -1,4 +1,3 @@
-discord_arch_electron
 gpu-usage-waybar-git
 grimblast-git
 hyprshell

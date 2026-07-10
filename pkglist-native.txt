@@ -7,6 +7,7 @@ bluez-utils
 brightnessctl
 btop
 btrfs-progs
+cava
 chafa
 clang
 cliphist
@@ -14,6 +15,7 @@ cmake
 code
 cups
 cups-pk-helper
+discord
 dolphin
 dunst
 efibootmgr
@@ -41,6 +43,7 @@ imagemagick
 imv
 intel-ucode
 kitty
+kvantum
 libpulse
 linux
 linux-firmware
@@ -64,6 +67,7 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+plasma-integration
 plymouth
 polkit-kde-agent
 power-profiles-daemon
@@ -74,6 +78,7 @@ sddm
 slurp
 smartmontools
 sof-firmware
+steam
 stow
 sudo
 swaync
