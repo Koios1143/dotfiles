@@ -1,0 +1,36 @@
+[Icon Theme]
+Name=NierHUD
+Comment=NieR-style monochrome line icons
+Inherits=Adwaita,hicolor
+Example=folder
+FollowsColorScheme=false
+
+Directories=places/scalable,mimetypes/scalable,devices/scalable,actions/scalable
+
+[places/scalable]
+Size=48
+MinSize=8
+MaxSize=512
+Context=Places
+Type=Scalable
+
+[mimetypes/scalable]
+Size=48
+MinSize=8
+MaxSize=512
+Context=MimeTypes
+Type=Scalable
+
+[devices/scalable]
+Size=48
+MinSize=8
+MaxSize=512
+Context=Devices
+Type=Scalable
+
+[actions/scalable]
+Size=48
+MinSize=8
+MaxSize=512
+Context=Actions
+Type=Scalable
