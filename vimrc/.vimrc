@@ -1,3 +1,4 @@
+source $VIMRUNTIME/defaults.vim
 set whichwrap+=<,>,[,]
 set mouse=a
 nnoremap <expr> <Down> line('.') == line('$') ? '$' : 'gj'
