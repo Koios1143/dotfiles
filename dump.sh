@@ -23,7 +23,8 @@ echo "寫入 $DOTFILES_DIR ..."
 # -Qqe：只列「主動安裝」的（排除被當依賴拉進來的）
 # -n：官方 repo  /  -m：foreign（AUR、手動裝的）
 pacman -Qqen > pkglist-native.txt
-pacman -Qqem > pkglist-aur.txt
+# paru / paru-debug 是 AUR helper 本身，重現環境時另外裝，這裡排除掉
+pacman -Qqem | grep -vxE 'paru(-debug)?' > pkglist-aur.txt
 echo "  [pkg] pkglist-native.txt ($(wc -l < pkglist-native.txt) 個)"
 echo "  [pkg] pkglist-aur.txt ($(wc -l < pkglist-aur.txt) 個)"
 
@@ -61,10 +62,52 @@ ETC_TARGETS=(
 )
 for t in "${ETC_TARGETS[@]}"; do backup_path "$t"; done
 
-# --- 字型清單 -------------------------------------------------------------
-{ ls -1 "$HOME/.local/share/fonts" 2>/dev/null || true
-  ls -1 "$HOME/.fonts" 2>/dev/null || true; } | sort -u > fonts-local.txt
-echo "  [font] fonts-local.txt"
+# --- /usr/share 系統資料備份（主題等，需 root 還原）------------------------
+# 跟 /etc 同樣是「複製快照」，但 /usr/share 底下常是整個目錄，可能夾帶
+# .git / *.bak / demo.gif 這類不該進 repo 的雜物，所以複製後再 find 剪掉。
+# 這些登入前就以 root 執行（SDDM / Plymouth），沒有 ~/.local/share 等價位置，
+# 只能走快照路線；有使用者層等價的（icon/主題/.desktop）請改放 ~ 底下用 stow。
+backup_share() {
+  local abs="$1"
+  local dest="system/${abs#/}"
+  if [[ -f "$abs" ]]; then
+    install -Dm644 "$abs" "$dest" && echo "  [usr] $abs"
+  elif [[ -d "$abs" ]]; then
+    rm -rf "$dest"
+    mkdir -p "$(dirname "$dest")"
+    cp -a "$abs" "$dest"
+    # 剪掉巢狀 git repo、備份檔、示範動畫等不需要進 repo 的東西
+    find "$dest" -depth \( -name .git -o -name '*.bak' -o -name demo.gif \) \
+      -exec rm -rf {} + 2>/dev/null || true
+    echo "  [usr] $abs/"
+  fi
+}
+
+SHARE_TARGETS=(
+  /usr/share/sddm/themes/nier-automata
+  # 之後要納管再取消註解 / 新增：
+  # /usr/share/wayland-sessions/hyprland-old.desktop
+  # /usr/share/plymouth/themes/nier   # 129M git repo，建議推自己的 remote 用 git-packages.txt 而非快照
+)
+for t in "${SHARE_TARGETS[@]}"; do backup_share "$t"; done
+
+# --- 自訂字型檔 -----------------------------------------------------------
+# NieR 等手動放進去的字型不屬於任何套件，重灌時裝不回來，所以把「檔案本身」
+# 納管。走 stow：檔案放在 fonts/.local/share/fonts/，bootstrap 會 symlink 回
+# ~/.local/share/fonts。
+# 只複製「真實檔案」；已被 stow 成 symlink 的（代表已在 repo 內）會被 -type f
+# 過濾掉，不會自我覆蓋。
+FONT_PKG="fonts/.local/share/fonts"
+mkdir -p "$FONT_PKG"
+for src in "$HOME/.local/share/fonts" "$HOME/.fonts"; do
+  [[ -d "$src" ]] || continue
+  find "$src" -maxdepth 1 -type f \
+    \( -iname '*.otf' -o -iname '*.ttf' -o -iname '*.ttc' -o -iname '*.pcf' -o -iname '*.pcf.gz' \) -print0 \
+    | while IFS= read -r -d '' f; do install -Dm644 "$f" "$FONT_PKG/$(basename "$f")"; done
+done
+# 同時留一份人可讀的清單方便檢視
+ls -1 "$FONT_PKG" 2>/dev/null | sort -u > fonts-local.txt
+echo "  [font] fonts/ ($(ls -1 "$FONT_PKG" 2>/dev/null | wc -l) 個字型檔) + fonts-local.txt"
 
 # --- 主題設定（若有 gsettings）--------------------------------------------
 if command -v gsettings >/dev/null 2>&1; then
