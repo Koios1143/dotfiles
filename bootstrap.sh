@@ -50,8 +50,8 @@ echo "=== 3/7 AUR helper ($AUR_HELPER) ==="
 if ! command -v "$AUR_HELPER" >/dev/null 2>&1; then
   echo "  安裝 paru-bin ..."
   tmp="$(mktemp -d)"
-  git clone https://aur.archlinux.org/paru-bin.git "$tmp/paru-bin"
-  ( cd "$tmp/paru-bin" && makepkg -si --noconfirm )
+  git clone https://aur.archlinux.org/paru.git "$tmp/paru"
+  ( cd "$tmp/paru" && makepkg -si --noconfirm && sudo pacman -S --noconfirm /tmp/paru/paru-debug-*.pkg.tar.zst)
   rm -rf "$tmp"
 else
   echo "  已存在，略過"
@@ -110,7 +110,7 @@ fi
 echo
 echo "完成！後續手動項目："
 echo "  • /etc 系統設定備份在 system/，檢視後再 sudo cp 回對應位置"
-echo "  • 自訂字型（fonts-local.txt）若有，記得放回 ~/.local/share/fonts 並 fc-cache -f"
+echo "  • 自訂字型已透過 fonts/ 這個 stow package symlink 到 ~/.local/share/fonts，執行 fc-cache -f 更新快取"
 echo "  • tpm 裝好後，在 tmux 內按 prefix + I 安裝外掛；p10k 首次啟動會跑設定精靈"
 echo "  • git-packages.extra.txt 裡若有需額外安裝的工具（如 qylock），clone 後依其說明再跑安裝腳本"
 echo "  • 重新登入 / 重開機讓 services 與 session 生效"
