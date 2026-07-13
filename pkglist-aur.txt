@@ -2,8 +2,6 @@ gpu-usage-waybar-git
 grimblast-git
 hyprshell
 nier-cursors-bin
-rustdesk
-sddm-astronaut-theme
 ttf-meslo-nerd-font-powerlevel10k
 wlogout
 zen-browser-bin
