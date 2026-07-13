@@ -48,9 +48,13 @@ for mf in "${MANIFESTS[@]}"; do
   [[ -f "$mf" ]] || continue
   found=1
   echo "--- $(basename "$mf") ---"
+  # 依路徑深度排序（父目錄先於子目錄）再安裝。否則先 clone 子目錄
+  # （如 .oh-my-zsh/custom/plugins/*）會用 mkdir -p 先建出父目錄，
+  # 之後 clone 父 repo（.oh-my-zsh）就會遇到「目錄已存在且非空」而失敗。
   while read -r dest url _rest; do
     install_one "$dest" "$url"
-  done < "$mf"
+  done < <(grep -vE '^[[:space:]]*(#|$)' "$mf" \
+             | awk '{n=gsub(/\//,"/"); print n"\t"$0}' | sort -n | cut -f2-)
 done
 
 [[ "$found" -eq 0 ]] && { echo "找不到任何 git-packages 清單，略過。"; exit 0; }
