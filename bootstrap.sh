@@ -65,6 +65,10 @@ else
 fi
 
 echo "=== 5/7 stow 套件 ==="
+# 先建好會被 stow「摺疊」的標準 XDG 目錄，讓它們維持真實目錄。
+# 否則 stow 會把整個 ~/Pictures 做成 symlink 指進 repo（wallpapers package），
+# 之後其他程式寫入 ~/Pictures 就會落進 dotfiles repo。
+mkdir -p "$HOME/Pictures"
 shopt -s nullglob
 for d in */; do
   name="${d%/}"
@@ -83,10 +87,10 @@ shopt -u nullglob
 echo "=== 6/7 手動 git 套件 ==="
 # 在 stow 之後跑：此時 .zshrc 等 symlink 已就位，
 # 用純 git clone 不會碰到 .zshrc，所以順序安全。
-if [[ -x ./install-git-packages.sh ]]; then
-  ./install-git-packages.sh
+if [[ -x ./install_git_packages.sh ]]; then
+  ./install_git_packages.sh
 else
-  echo "  找不到 install-git-packages.sh，略過"
+  echo "  找不到 install_git_packages.sh，略過"
 fi
 
 echo "=== 7/7 services ==="
