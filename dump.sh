@@ -149,7 +149,10 @@ emit_repo() {              # $1 = repo 絕對路徑
     for child in "$parent"/*/; do emit_repo "${child%/}"; done
   done
   shopt -u nullglob
-} | sort -u > git-packages.txt
+# LC_ALL=C：用「位元組順序」排序，空白(0x20) < 斜線(0x2f)，
+# 所以像 ".oh-my-zsh <url>" 一定排在其子目錄 ".oh-my-zsh/custom/... <url>" 前面
+# ——父 repo 先 clone，子目錄（外掛 / 主題）才有地方放，還原順序才正確。
+} | LC_ALL=C sort -u > git-packages.txt
 echo "  [git] git-packages.txt ($(grep -cv '^[[:space:]]*$' git-packages.txt) 個)"
 
 echo
