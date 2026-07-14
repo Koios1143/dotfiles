@@ -1,1 +1,0 @@
-qylock https://github.com/Darkkal44/qylock.git
