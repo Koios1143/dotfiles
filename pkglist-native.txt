@@ -1,6 +1,7 @@
 base
 base-devel
 bashtop
+bc
 blueman
 bluez
 bluez-utils
@@ -32,6 +33,7 @@ fzf
 git
 grim
 grub
+grub-btrfs
 gst-plugin-pipewire
 gthumb
 gvfs
@@ -44,9 +46,11 @@ imv
 intel-ucode
 kitty
 kvantum
+less
 libpulse
 linux
 linux-firmware
+linux-headers
 mediainfo
 mission-center
 mpv
@@ -62,6 +66,8 @@ nvidia-open
 nvidia-utils
 nvtop
 nwg-displays
+openssh
+os-prober
 pavucontrol
 pipewire
 pipewire-alsa
@@ -71,14 +77,16 @@ plasma-integration
 plymouth
 polkit-kde-agent
 power-profiles-daemon
+powertop
 qt5-wayland
 qt6-wayland
 quickshell
 sddm
 slurp
 smartmontools
+snap-pac
+snapper
 sof-firmware
-steam
 stow
 sudo
 swaync
@@ -87,8 +95,11 @@ system-config-printer
 tailscale
 thunar
 thunar-volman
+tlp
 tmux
+ttf-dejavu
 ttf-jetbrains-mono-nerd
+ttf-liberation
 ttf-nerd-fonts-symbols
 tumbler
 ufw
@@ -97,6 +108,8 @@ uwsm
 vim
 vulkan-nouveau
 waybar
+weston
+wev
 wf-recorder
 wget
 wireplumber

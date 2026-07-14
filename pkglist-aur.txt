@@ -1,3 +1,4 @@
+envycontrol
 gpu-usage-waybar-git
 grimblast-git
 hyprshell
