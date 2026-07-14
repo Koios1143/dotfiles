@@ -47,6 +47,8 @@ kitty
 kvantum
 less
 libpulse
+libreoffice-fresh
+libreoffice-fresh-zh-tw
 linux
 linux-firmware
 linux-headers
