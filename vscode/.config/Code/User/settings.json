@@ -1,0 +1,18 @@
+{
+    "workbench.colorTheme": "Tokyo Night Storm",
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "/usr/bin/bash"
+        },
+        "zsh": {
+            "path": "/usr/bin/zsh"
+        },
+        "tmux": {
+            "path": "/usr/bin/tmux"
+        }
+    },
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', 'YoRHa Symbols'"
+}
