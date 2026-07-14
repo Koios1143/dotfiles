@@ -4,5 +4,6 @@ grimblast-git
 hyprshell
 nier-cursors-bin
 ttf-meslo-nerd-font-powerlevel10k
+visual-studio-code-bin
 wlogout
 zen-browser-bin

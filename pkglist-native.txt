@@ -13,7 +13,6 @@ chafa
 clang
 cliphist
 cmake
-code
 cups
 cups-pk-helper
 discord
