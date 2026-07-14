@@ -47,7 +47,7 @@ ModifierOnlyKeyTimeout=250
 
 [Behavior]
 # Activate input method by default
-ActiveByDefault=False
+ActiveByDefault=True
 # Reset state on Focus In
 resetStateWhenFocusIn=No
 # Share Input State
