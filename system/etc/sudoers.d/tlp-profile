@@ -1,0 +1,4 @@
+# Let the status bar (nierbar) switch TLP power profiles without a password prompt.
+# Restricted to exactly these three profile commands plus `tlp start` (auto mode);
+# no other TLP subcommand is granted. Consumed by PowerProfileService.qml.
+koios ALL=(root) NOPASSWD: /usr/bin/tlp performance, /usr/bin/tlp balanced, /usr/bin/tlp power-saver, /usr/bin/tlp start

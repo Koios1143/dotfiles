@@ -59,8 +59,23 @@ fi
 # ---------------- slow lane ----------------
 if $want_slow; then
   gpu="--"
+  # The NVIDIA dGPU sleeps in RTD3 (see AQ_DRM_DEVICES in hyprland.lua). Reading its
+  # utilization with nvidia-smi WAKES it, so polling it here would pin it awake and
+  # defeat the power saving. Only query when it's already awake AND a process is
+  # actually holding it; otherwise report idle without touching it. runtime_status is
+  # a cheap, wake-free read, so once it suspends we take the fast path and leave it be.
+  nv=/sys/bus/pci/devices/0000:01:00.0/power/runtime_status
   if command -v nvidia-smi >/dev/null 2>&1; then
-    gpu=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -n1 || echo "--")
+    if [ "$(cat "$nv" 2>/dev/null || echo suspended)" = "suspended" ]; then
+      gpu="0"                                    # asleep -> idle; do not wake it
+    else
+      holders=$(ls -l /proc/[0-9]*/fd/ 2>/dev/null | grep -c '/dev/nvidia[0-9]' || true)
+      if [ "${holders:-0}" -gt 0 ]; then
+        gpu=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -n1 || echo "--")
+      else
+        gpu="0"                                  # awake but unused -> let it idle back to sleep
+      fi
+    fi
   elif command -v rocm-smi >/dev/null 2>&1; then
     gpu=$(rocm-smi --showuse --json 2>/dev/null | jq -r 'to_entries[0].value."GPU use (%)" // "--"' 2>/dev/null || echo "--")
   fi

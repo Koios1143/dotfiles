@@ -1,0 +1,14 @@
+[Unit]
+Description=Enable NumLock on all virtual consoles at boot
+# Run before the display manager claims its VT, so SDDM/Hyprland inherit a
+# consistent NumLock=on state (works around wlroots/Hyprland numlock desync).
+Before=display-manager.service
+After=systemd-user-sessions.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c 'for t in /dev/tty1 /dev/tty2 /dev/tty3 /dev/tty4 /dev/tty5 /dev/tty6; do /usr/bin/setleds +num < "$t" >/dev/null 2>&1 || true; done'
+
+[Install]
+WantedBy=multi-user.target

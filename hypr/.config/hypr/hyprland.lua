@@ -89,6 +89,12 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- Qt platform theme: let KDE apps (Dolphin) read the Nier color scheme from kdeglobals
 hl.env("QT_QPA_PLATFORMTHEME", "kde")
 
+-- Hardware-adaptive GPU power tuning: on a hybrid NVIDIA laptop this keeps the dGPU
+-- off the render path so it can sleep; on every other host it is a no-op. Detection
+-- and rationale live in gpu.lua. Applied at startup, so it needs a Hyprland restart /
+-- relogin to take effect. Want the dGPU for an app? Vulkan/CUDA/GLX offload still work.
+for k, v in pairs(require("gpu")()) do hl.env(k, v) end
+
 
 -----------------------
 ----- PERMISSIONS -----
@@ -264,7 +270,7 @@ hl.config({
         follow_mouse = 1,
 
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
-	numlock_by_default = false,
+	numlock_by_default = true,
 
         touchpad = {
             natural_scroll = true,
@@ -287,7 +293,7 @@ hl.device({
 })
 hl.device({
     name = "at-translated-set-2-keyboard",
-    numlock_by_default = false,
+    numlock_by_default = true,
 })
 
 ---------------------
@@ -393,10 +399,13 @@ hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copy save active ~/Pi
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p " .. home .. "/.config/quickshell/powermenu/shell.qml"))
 
 -- color picker
-hl.bind("ALT + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
+hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
 
 -- clipboard history
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("qs -c nier-clipboard ipc call clipboard toggle"))
+
+-- Acer Predactor Scene (Linux ver)
+hl.bind("XF86Launch1", hl.dsp.exec_cmd("DAMX"))
 
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
