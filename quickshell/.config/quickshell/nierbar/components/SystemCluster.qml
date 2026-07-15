@@ -12,8 +12,10 @@ Row {
   property var onBluetoothClick: null
   spacing: Theme.compactGap
 
-  // non-visual: Row skips invisible children, so it stays out of the layout
-  PowerProfileService { id: power; visible: false }
+  // non-visual: Row skips invisible children, so it stays out of the layout.
+  // sys.charging is true whenever on AC (the state script keys it off /online),
+  // so it doubles as the "on AC" gate that hides performance on battery.
+  PowerProfileService { id: power; visible: false; onAc: root.sys ? !!root.sys.charging : true }
 
   function pct(v) { return v === "--" ? "--" : v + "%" }
   function volumeIcon() {
