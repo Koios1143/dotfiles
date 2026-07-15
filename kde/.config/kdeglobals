@@ -142,6 +142,7 @@ widgetStyle=kvantum
 Theme=NierHUD
 
 [KDE]
+ShowDeleteCommand=true
 contrast=4
 
 [KFileDialog Settings]
@@ -160,6 +161,13 @@ Sort hidden files last=false
 Sort reversed=false
 Speedbar Width=154
 View Style=DetailTree
+
+[KShortcutsDialog Settings]
+Dialog Size=600,480
+
+[PreviewSettings]
+EnableRemoteFolderThumbnail=false
+MaximumRemoteSize=0
 
 [WM]
 activeBackground=17,17,15

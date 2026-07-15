@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+MimeType=all/all;
+Actions=openWithVSCode;
+X-KDE-Priority=TopLevel
+
+[Desktop Action openWithVSCode]
+Name=Open with VSCode
+Name[zh_TW]=以 VSCode 開啟
+Icon=vscode
+Exec=code %F
