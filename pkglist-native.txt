@@ -16,6 +16,7 @@ cmake
 cups
 cups-pk-helper
 discord
+dnsmasq
 dolphin
 dunst
 efibootmgr
@@ -88,6 +89,7 @@ smartmontools
 snap-pac
 snapper
 sof-firmware
+speech-dispatcher
 stow
 sudo
 swaync
@@ -103,6 +105,7 @@ ttf-jetbrains-mono-nerd
 ttf-liberation
 ttf-nerd-fonts-symbols
 tumbler
+turbostat
 ufw
 unzip
 uwsm

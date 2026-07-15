@@ -23,12 +23,23 @@ PanelWindow {
 
   property string pendingSsid: ""
 
+  // ---- hotspot panel UI state ----
+  property bool hsShowPw: false    // reveal the password field (eye toggle)
+  property bool hsShowQr: false    // show the join QR instead of the client list
+  property string hsBand: "bg"     // currently-selected band in the picker
+
   // scene-x and width of the icon that opened us, so the card sits below it
   property real anchorX: 0
   property real anchorWidth: 0
 
-  function open() { pop.shown = true; net.refresh(); net.rescan() }
-  function close() { pop.shown = false; pop.pendingSsid = ""; pwField.text = "" }
+  function seedHotspotFields() {
+    if (!ssidField.activeFocus) ssidField.text = net.hotspotSsid
+    if (!pwHsField.activeFocus) pwHsField.text = net.hotspotPassword
+    pop.hsBand = net.hotspotBand
+  }
+
+  function open() { pop.shown = true; net.refresh(); net.rescan(); pop.seedHotspotFields() }
+  function close() { pop.shown = false; pop.pendingSsid = ""; pwField.text = ""; pop.hsShowQr = false }
   function toggle() { pop.shown ? pop.close() : pop.open() }
   function openAt(x, w) { pop.anchorX = x; pop.anchorWidth = w; pop.open() }
   function toggleAt(x, w) { pop.shown ? pop.close() : pop.openAt(x, w) }
@@ -70,9 +81,38 @@ PanelWindow {
     else net.activate(p.name, p.uuid)
   }
 
+  function toggleHotspot() {
+    if (net.hotspotActive) net.stopHotspot()
+    else net.startHotspot(net.hotspotSsid, net.hotspotPassword, net.hotspotBand)
+  }
+
+  // re-apply the current field values to a running hotspot (SSID / pw / band)
+  function applyHotspot() {
+    net.startHotspot(ssidField.text, pwHsField.text, pop.hsBand)
+    if (pop.hsShowQr) net.makeQr()
+  }
+
   NetworkService {
     id: net
     onNeedsPassword: ssid => { if (pop.shown) pop.promptPassword(ssid) }
+  }
+
+  // the hotspot status arrives asynchronously after open(); reseed the fields
+  // (unless the user is mid-edit) so they reflect the stored config.
+  Connections {
+    target: net
+    function onHotspotSsidChanged() { if (!ssidField.activeFocus) ssidField.text = net.hotspotSsid }
+    function onHotspotPasswordChanged() { if (!pwHsField.activeFocus) pwHsField.text = net.hotspotPassword }
+    function onHotspotBandChanged() { pop.hsBand = net.hotspotBand }
+  }
+
+  // poll associated clients while the hotspot panel is showing the list
+  Timer {
+    interval: 4000
+    repeat: true
+    triggeredOnStart: true
+    running: pop.shown && net.hotspotActive && !pop.hsShowQr
+    onTriggered: net.refreshClients()
   }
 
   // click anywhere outside the card to close
@@ -150,14 +190,28 @@ PanelWindow {
           }
 
           Text {
-            text: net.wifiEnabled ? "󰖩" : "󰖪"      // wifi on / off
-            color: net.wifiEnabled ? Theme.blue : Theme.muted
+            text: "󰀃"                              // hotspot (access point)
+            color: net.hotspotActive ? Theme.blue : Theme.muted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.iconText
             MouseArea {
               anchors.fill: parent
               cursorShape: Qt.PointingHandCursor
-              onClicked: net.toggleWifi()
+              onClicked: pop.toggleHotspot()
+            }
+          }
+
+          Text {
+            // wifi reads as "off" while the hotspot owns the radio (client mode
+            // is dropped); clicking it then stops the hotspot to restore wifi.
+            text: (net.wifiEnabled && !net.hotspotActive) ? "󰖩" : "󰖪"
+            color: (net.wifiEnabled && !net.hotspotActive) ? Theme.blue : Theme.muted
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.iconText
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: net.hotspotActive ? net.stopHotspot() : net.toggleWifi()
             }
           }
         }
@@ -265,7 +319,9 @@ PanelWindow {
           spacing: 2
 
           Repeater {
-            model: net.networks
+            // while the AP is up the device can't scan as a client; hide the
+            // whole list (including the hotspot's own SSID).
+            model: net.hotspotActive ? [] : net.networks
             delegate: Rectangle {
               id: row
               required property var modelData
@@ -321,9 +377,10 @@ PanelWindow {
           }
 
           Text {
-            visible: net.networks.length === 0
+            visible: net.hotspotActive || net.networks.length === 0
             padding: 6
-            text: net.wifiEnabled ? "No networks found" : "WiFi is off"
+            text: net.hotspotActive ? "Hotspot active — WiFi paused"
+                                    : (net.wifiEnabled ? "No networks found" : "WiFi is off")
             color: Theme.muted
             font.family: Theme.fontFamily
             font.pixelSize: Theme.smallText
@@ -449,6 +506,281 @@ PanelWindow {
         color: Theme.muted
         font.family: Theme.fontFamily
         font.pixelSize: Theme.tinyText
+      }
+
+      // ==== hotspot settings (only while the hotspot is running) ====
+      Rectangle {
+        visible: net.hotspotActive
+        width: parent.width
+        height: 1
+        color: Theme.dim
+      }
+
+      Column {
+        visible: net.hotspotActive
+        width: parent.width
+        spacing: 8
+
+        Text {
+          text: "HOTSPOT"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+          font.letterSpacing: 1.5
+        }
+
+        // ---- SSID ----
+        Text {
+          text: "SSID"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+        }
+        Rectangle {
+          width: parent.width
+          height: 26
+          color: Theme.bgAlt
+          border.color: ssidField.activeFocus ? Theme.line : Theme.dim
+          border.width: 1
+          TextInput {
+            id: ssidField
+            anchors.fill: parent
+            anchors.leftMargin: 6
+            anchors.rightMargin: 6
+            verticalAlignment: TextInput.AlignVCenter
+            color: Theme.fg
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.smallText
+            clip: true
+            onAccepted: pop.applyHotspot()
+          }
+        }
+
+        // ---- password (with reveal toggle, hidden by default) ----
+        Text {
+          text: "Password"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+        }
+        Rectangle {
+          width: parent.width
+          height: 26
+          color: Theme.bgAlt
+          border.color: pwHsField.activeFocus ? Theme.line : Theme.dim
+          border.width: 1
+
+          TextInput {
+            id: pwHsField
+            anchors.left: parent.left
+            anchors.right: eyeBtn.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 6
+            anchors.rightMargin: 6
+            height: parent.height
+            verticalAlignment: TextInput.AlignVCenter
+            color: Theme.fg
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.smallText
+            echoMode: pop.hsShowPw ? TextInput.Normal : TextInput.Password
+            clip: true
+            onAccepted: pop.applyHotspot()
+          }
+
+          Text {
+            id: eyeBtn
+            anchors.right: parent.right
+            anchors.rightMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            text: pop.hsShowPw ? "󰈈" : "󰈉"      // open eye = shown, eye-off = hidden
+            color: pop.hsShowPw ? Theme.blue : Theme.muted
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.iconText
+            MouseArea {
+              anchors.fill: parent
+              anchors.margins: -4
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.hsShowPw = !pop.hsShowPw
+            }
+          }
+        }
+
+        // ---- band ----
+        Text {
+          text: "Band"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+        }
+        Row {
+          width: parent.width
+          spacing: 6
+
+          Rectangle {
+            width: (parent.width - 6) / 2
+            height: 26
+            color: pop.hsBand === "bg" ? Theme.activeBg : "transparent"
+            border.color: pop.hsBand === "bg" ? Theme.activeBg : Theme.dim
+            border.width: 1
+            Text {
+              anchors.centerIn: parent
+              text: "2.4 GHz"
+              color: pop.hsBand === "bg" ? Theme.activeFg : Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.hsBand = "bg"
+            }
+          }
+
+          Rectangle {
+            width: (parent.width - 6) / 2
+            height: 26
+            color: pop.hsBand === "a" ? Theme.activeBg : "transparent"
+            border.color: pop.hsBand === "a" ? Theme.activeBg : Theme.dim
+            border.width: 1
+            Text {
+              anchors.centerIn: parent
+              text: "5 GHz"
+              color: pop.hsBand === "a" ? Theme.activeFg : Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+            MouseArea {
+              anchors.fill: parent
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.hsBand = "a"
+            }
+          }
+        }
+
+        // ---- apply + QR toggle ----
+        Row {
+          width: parent.width
+          spacing: 6
+          layoutDirection: Qt.RightToLeft
+
+          Rectangle {
+            width: 84
+            height: 26
+            color: applyMouse.containsMouse ? Theme.activeBg : "transparent"
+            border.color: Theme.line
+            border.width: 1
+            Text {
+              anchors.centerIn: parent
+              text: "Apply"
+              color: applyMouse.containsMouse ? Theme.activeFg : Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+            MouseArea {
+              id: applyMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.applyHotspot()
+            }
+          }
+
+          Rectangle {
+            width: parent.width - 84 - 6
+            height: 26
+            color: qrMouse.containsMouse ? Theme.bgAlt : "transparent"
+            border.color: pop.hsShowQr ? Theme.line : Theme.dim
+            border.width: 1
+            Text {
+              anchors.centerIn: parent
+              text: pop.hsShowQr ? "󰅖  Hide QR" : "󰐲  Show QR"
+              color: Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+            MouseArea {
+              id: qrMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: { pop.hsShowQr = !pop.hsShowQr; if (pop.hsShowQr) net.makeQr() }
+            }
+          }
+        }
+
+        // ---- QR view (replaces the client list while shown) ----
+        Item {
+          visible: pop.hsShowQr
+          width: parent.width
+          height: visible ? 176 : 0
+          Rectangle {
+            anchors.centerIn: parent
+            width: 168
+            height: 168
+            color: "white"
+            Image {
+              anchors.centerIn: parent
+              width: 156
+              height: 156
+              source: net.hotspotQrPath
+              fillMode: Image.PreserveAspectFit
+              smooth: false
+              cache: false
+            }
+          }
+        }
+
+        // ---- connected devices ----
+        Column {
+          visible: !pop.hsShowQr
+          width: parent.width
+          spacing: 4
+
+          Text {
+            text: "CONNECTED (" + net.hotspotClients.length + ")"
+            color: Theme.muted
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.tinyText
+            font.letterSpacing: 1.5
+          }
+
+          Repeater {
+            model: net.hotspotClients
+            delegate: Row {
+              id: clientRow
+              required property var modelData
+              width: parent ? parent.width : 0
+              height: 18
+              spacing: 8
+
+              Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 7
+                height: 7
+                radius: 3.5
+                color: Theme.green
+              }
+
+              Text {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 7 - 8
+                elide: Text.ElideRight
+                text: clientRow.modelData
+                color: Theme.fg
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.smallText
+              }
+            }
+          }
+
+          Text {
+            visible: net.hotspotClients.length === 0
+            text: "No devices connected"
+            color: Theme.muted
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.smallText
+          }
+        }
       }
     }
   }

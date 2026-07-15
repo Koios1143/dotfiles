@@ -7,6 +7,8 @@ import Quickshell.Io
 Item {
   id: root
 
+  property string scriptPath: Quickshell.shellDir + "/scripts/hotspot.sh"
+
   property bool wifiEnabled: true
   property var networks: []        // [{ ssid, signal, security, inUse }]
   property var savedConnections: []  // names of stored wifi profiles
@@ -15,6 +17,16 @@ Item {
   property string activeSsid: ""
   property bool busy: false
   property string status: ""
+
+  // ---- hotspot (AP mode sharing the wired/other connection) ----
+  property bool hotspotActive: false
+  property string hotspotDevice: ""       // iface the AP runs on (for client lookup)
+  property string hotspotSsid: "nierbar"  // last-used / default config, prefilled in UI
+  property string hotspotPassword: ""
+  property string hotspotBand: "bg"        // "bg" = 2.4GHz, "a" = 5GHz
+  property var hotspotClients: []          // display names of associated stations
+  property string hotspotQrPath: ""        // file:// url of the last rendered QR
+  property int _qrGen: 0                    // bumps the url so the Image reloads
 
   // raised when a passwordless connect fails because a secret is required
   signal needsPassword(string ssid)
@@ -31,6 +43,52 @@ Item {
     listProc.running = true
     savedProc.running = true
     profProc.running = true
+    hsStatusProc.running = true
+  }
+
+  // ---- hotspot control ----
+
+  function refreshHotspot() { hsStatusProc.running = true }
+
+  function parseHotspot(data) {
+    try {
+      var o = JSON.parse(data)
+      root.hotspotActive = o.active ?? false
+      root.hotspotDevice = o.device ?? ""
+      if (o.ssid && o.ssid.length) root.hotspotSsid = o.ssid
+      root.hotspotPassword = o.password ?? ""
+      if (o.band && o.band.length) root.hotspotBand = o.band
+      if (!root.hotspotActive) root.hotspotClients = []
+    } catch (e) {
+      console.log("NetworkService parseHotspot failed:", e, data)
+    }
+  }
+
+  // starting the AP takes the wifi device out of client mode, so the normal
+  // wifi connection drops — that is the intended "turn wifi off" behaviour.
+  function startHotspot(ssid, password, band) {
+    root.busy = true
+    root.status = "Starting hotspot…"
+    hsStartProc.command = [root.scriptPath, "start",
+                           ssid || "nierbar", password || "", band || "bg"]
+    hsStartProc.running = true
+  }
+
+  function stopHotspot() {
+    root.busy = true
+    root.status = "Stopping hotspot…"
+    hsStopProc.running = true
+  }
+
+  function refreshClients() {
+    if (!root.hotspotActive) { root.hotspotClients = []; return }
+    hsClientsProc.command = [root.scriptPath, "clients", root.hotspotDevice]
+    hsClientsProc.running = true
+  }
+
+  function makeQr() {
+    hsQrProc.command = [root.scriptPath, "qr", root.hotspotSsid, root.hotspotPassword]
+    hsQrProc.running = true
   }
 
   // bring a stored profile up / down by uuid. Works for any type (ethernet,
@@ -234,5 +292,48 @@ Item {
   Process {
     id: profDownProc
     onExited: function (code, st) { root.busy = false; root.status = ""; root.refresh() }
+  }
+
+  Process {
+    id: hsStatusProc
+    command: [root.scriptPath, "status"]
+    stdout: StdioCollector { onStreamFinished: root.parseHotspot(text) }
+  }
+
+  Process {
+    id: hsStartProc
+    stderr: StdioCollector { id: hsStartErr }
+    onExited: function (code, st) {
+      root.busy = false
+      root.status = (code === 0) ? "Hotspot on"
+                                 : (("" + hsStartErr.text).trim() || "Hotspot failed")
+      root.refresh()
+    }
+  }
+
+  Process {
+    id: hsStopProc
+    command: [root.scriptPath, "stop"]
+    onExited: function (code, st) { root.busy = false; root.status = ""; root.refresh() }
+  }
+
+  Process {
+    id: hsClientsProc
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try { root.hotspotClients = JSON.parse(text) }
+        catch (e) { root.hotspotClients = [] }
+      }
+    }
+  }
+
+  Process {
+    id: hsQrProc
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var p = ("" + text).trim()
+        if (p.length) { root._qrGen++; root.hotspotQrPath = "file://" + p + "?g=" + root._qrGen }
+      }
+    }
   }
 }
