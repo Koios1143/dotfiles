@@ -122,8 +122,8 @@ for k, v in pairs(require("gpu")()) do hl.env(k, v) end
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
     general = {
-        gaps_in  = 5,
-        gaps_out = 20,
+        gaps_in  = 3,
+        gaps_out = 5,
 
         border_size = 2,
 
@@ -385,14 +385,15 @@ hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = tr
 
 -- 框選區域，存檔 + 複製到剪貼簿
 -- hl.bind("Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
-hl.bind("Print", hl.dsp.exec_cmd("grimblast --freeze copysave area ~Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
+hl.bind("Print", hl.dsp.exec_cmd("grimblast --freeze copysave area " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
+hl.bind("ALT + SHIFT + S", hl.dsp.exec_cmd("grimblast --freeze copysave area " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
 -- 整個螢幕，存檔 + 複製
 -- hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grim - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grimblast --freeze copysave screen ~/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grimblast --freeze copysave screen " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
 -- 目前視窗
-hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copy save active ~/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
+hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copy save active " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
 -- Logout menu
 -- hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout"))
