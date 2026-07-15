@@ -133,6 +133,8 @@ ForegroundVisited=109,143,214
 [General]
 ColorScheme=Nier
 Name=Nier
+TerminalApplication=kitty
+TerminalService=kitty.desktop
 shadeSortColumn=true
 widgetStyle=kvantum
 
