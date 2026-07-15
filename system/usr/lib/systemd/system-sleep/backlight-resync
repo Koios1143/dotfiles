@@ -1,0 +1,31 @@
+#!/bin/sh
+# Re-apply backlight brightness on resume.
+#
+# nvidia_wmi_ec_backlight (and some other EC/firmware-driven backlights) get
+# reset to a bright default by firmware on resume from suspend/hibernate, while
+# the kernel's cached `brightness` value is restored to its pre-sleep value.
+# The driver never re-pushes that cached value to the EC, so the panel is
+# physically brighter than the value shown in the bar (which reads `brightness`).
+#
+# Nudging the value (write a neighbouring value, then write the real one back)
+# forces the driver's set path to push the correct value to the hardware again.
+# The final state is identical to what it was before sleep, so the bar stays put.
+
+case "$1" in
+    post)
+        for bl in /sys/class/backlight/*; do
+            [ -e "$bl/brightness" ] || continue
+            cur=$(cat "$bl/brightness") || continue
+            max=$(cat "$bl/max_brightness" 2>/dev/null) || max=0
+            if [ "$cur" -gt 0 ]; then
+                nudge=$((cur - 1))
+            elif [ "$max" -gt 0 ]; then
+                nudge=1
+            else
+                nudge="$cur"
+            fi
+            echo "$nudge" > "$bl/brightness" 2>/dev/null || true
+            echo "$cur"   > "$bl/brightness" 2>/dev/null || true
+        done
+        ;;
+esac
