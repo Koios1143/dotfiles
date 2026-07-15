@@ -122,6 +122,12 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
+# Override TERM for remote hosts that lack the xterm-kitty terminfo entry.
+# Fixes "terminals database is inaccessible" and broken redraw/line-editing on ssh.
+if [[ "$TERM" == "xterm-kitty" ]]; then
+    alias ssh='TERM=xterm-256color command ssh'
+fi
+
 source <(fzf --zsh)
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR=vim
