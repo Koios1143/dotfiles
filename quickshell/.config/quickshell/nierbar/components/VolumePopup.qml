@@ -217,7 +217,7 @@ PanelWindow {
         spacing: 2
 
         Repeater {
-          model: audio.sinks
+          model: audio.availableSinks
           delegate: Rectangle {
             id: srow
             required property var modelData
@@ -247,7 +247,7 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - 16 - 8
                 elide: Text.ElideRight
-                text: srow.modelData.description
+                text: srow.modelData.port || srow.modelData.description
                 color: srow.isDefault ? Theme.blue : Theme.fg
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.smallText
@@ -265,7 +265,7 @@ PanelWindow {
         }
 
         Text {
-          visible: audio.sinks.length === 0
+          visible: audio.availableSinks.length === 0
           padding: 6
           text: "No output devices"
           color: Theme.muted

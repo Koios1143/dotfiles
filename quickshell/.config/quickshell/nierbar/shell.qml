@@ -45,6 +45,14 @@ ShellRoot {
         sys: sys
       }
 
+      // bottom-centre HUD shown when volume/brightness change (keys, wheel,
+      // sliders); suppressed while a click-slider popup is already open
+      OsdPanel {
+        screen: unit.modelData
+        sys: sys
+        suppress: volPopup.shown || brightPopup.shown
+      }
+
       BluetoothPopup {
         id: btPopup
         screen: unit.modelData
