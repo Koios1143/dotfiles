@@ -52,6 +52,10 @@ Scope {
     // latest qalc result (filled async by calcProc); "" while pending/idle
     property string calcResult: ""
 
+    // calc-only mode: no apps listed, the whole query is treated as an
+    // expression (like rofi's calc modi). Toggled via `ipc call launcher calc`.
+    property bool calcMode: false
+
     // ---- usage frequency (persisted): { appKey: launchCount } -------------
     property var usage: ({})
     function appKey(a)   { return (a && (a.id || a.name)) || ""; }
@@ -78,6 +82,7 @@ Scope {
     // ---- calc detection: "=expr", or a number-led arithmetic expression ----
     function calcExpr(q) {
         q = (q || "").trim();
+        if (root.calcMode) return { isCalc: true, expr: q };   // whole query is the expression
         if (q.charAt(0) === "=") return { isCalc: true, expr: q.slice(1).trim() };
         if (q.length > 0 && /^[\d.(]/.test(q) && /[-+*/%^]/.test(q))
             return { isCalc: true, expr: q };
@@ -115,6 +120,7 @@ Scope {
             return [{ calc: true, expr: c.expr,
                       name: c.expr + "   =   " + (root.calcResult.length ? root.calcResult : "…") }];
         }
+        if (root.calcMode) return [];                   // calc-only: never list apps
         var apps = DesktopEntries.applications.values;
         var ql = (q || "").trim().toLowerCase();
         var scored = [];
@@ -148,7 +154,7 @@ Scope {
         }
     }
 
-    function show() {
+    function open() {
         search.text = "";              // don't keep last query
         root.calcResult = "";
         list.currentIndex = 0;         // focus back to the top entry
@@ -159,12 +165,17 @@ Scope {
         grab.active = true;            // arm focus-loss dismissal
         Qt.callLater(function () { search.forceActiveFocus(); });
     }
+    function show()     { root.calcMode = false; root.open(); }   // app launcher
+    function showCalc() { root.calcMode = true;  root.open(); }   // calculator only
     function hide() {
         root.armed = false;
         grab.active = false;
         win.visible = false;
     }
-    function toggle() { if (win.visible) root.hide(); else root.show(); }
+    // each shortcut toggles its own mode; hitting the other one while open
+    // just switches mode (stays open) rather than closing.
+    function toggle()     { if (win.visible && !root.calcMode) root.hide(); else root.show(); }
+    function toggleCalc() { if (win.visible &&  root.calcMode) root.hide(); else root.showCalc(); }
 
     // called from Hyprland: `qs -c nier-launcher ipc call launcher toggle`
     IpcHandler {
@@ -172,6 +183,7 @@ Scope {
         function toggle(): void { root.toggle(); }
         function show():   void { root.show(); }
         function hide():   void { root.hide(); }
+        function calc():   void { root.toggleCalc(); }   // calculator-only mode
     }
 
     function activate(idx) {
@@ -239,7 +251,8 @@ Scope {
         Rectangle {
             id: card
             width: 800
-            height: 556
+            // calc-only mode shrinks to ~one result row; app mode is full height
+            height: root.calcMode ? 240 : 556
             anchors.centerIn: parent
             color: "transparent"
             MouseArea { anchors.fill: parent }   // absorb clicks on the card
@@ -250,7 +263,8 @@ Scope {
                 Math.max(0, Math.min(1, (intro - 0.2) / 0.8))
             property real railIn: 0                      // left axis slide-in (0 = off-left)
             property real kiteFade: 0                    // kite arrow fade-in
-            property string titleText: "APPLICATIONS"    // decoded title (reveals L->R)
+            readonly property string fullTitle: root.calcMode ? "CALCULATOR" : "APPLICATIONS"
+            property string titleText: fullTitle          // decoded title (reveals L->R)
             property real titleDecode: 0                 // animated 0->len, drives lock progression
             property int titleLocked: 0                  // chars settled so far (= floor(titleDecode))
 
@@ -274,10 +288,10 @@ Scope {
             readonly property string glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
             NumberAnimation {
                 id: decodeAnim; target: card; property: "titleDecode"
-                from: 0; to: 12; duration: 780; easing.type: Easing.Linear
+                from: 0; to: card.fullTitle.length; duration: 780; easing.type: Easing.Linear
             }
             onTitleDecodeChanged: {
-                var full = "APPLICATIONS";
+                var full = card.fullTitle;
                 card.titleLocked = Math.min(full.length, Math.floor(card.titleDecode));
                 if (card.titleLocked >= full.length) {
                     card.titleText = full;                 // fully decoded
@@ -398,7 +412,7 @@ Scope {
                     visible: search.text.length === 0
                     anchors.verticalCenter: parent.verticalCenter
                     x: search.x
-                    text: "Search apps or type a calculation…"
+                    text: root.calcMode ? "Type a calculation…" : "Search apps or type a calculation…"
                     color: root.muted; font.family: root.face; font.pixelSize: 14
                 }
 

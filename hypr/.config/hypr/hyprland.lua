@@ -311,7 +311,7 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(home .. "/.config/quickshell/nier-loc
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("dolphin"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher toggle"))
-hl.bind("ALT + Space", hl.dsp.exec_cmd("rofi -show calc -modi calc -no-show-match -no-sort"))
+hl.bind("ALT + Space", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher calc"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 1 }))
