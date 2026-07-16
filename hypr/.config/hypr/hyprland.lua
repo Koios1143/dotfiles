@@ -129,7 +129,7 @@ hl.config({
 
         col = {
             -- NieR palette: active = bone -> amber gradient, inactive = dim
-            active_border   = "rgba(d7d0c4ff)",
+            active_border   = "rgba(d99b45ff)",
             inactive_border = "rgba(5b5649aa)",
         },
 
