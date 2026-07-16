@@ -21,7 +21,8 @@ Row {
   function volumeIcon() {
     if (sys.muted) return "󰝟"
     const v = Number(sys.volume)
-    if (isNaN(v) || v <= 0) return "󰕿"
+    if (isNaN(v)) return "󰕿"
+    if (v <= 0) return "󰝟"          // zero volume reads as muted
     if (v <= 50) return "󰖀"
     return "󰕾"
   }

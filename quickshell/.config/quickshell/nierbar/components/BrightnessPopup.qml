@@ -128,30 +128,14 @@ PanelWindow {
         width: parent.width
         height: 18
 
-        Rectangle {
-          id: track
+        SegmentBar {
           anchors.verticalCenter: parent.verticalCenter
           width: parent.width
-          height: 6
-          radius: 3
-          color: Theme.dim
-
-          Rectangle {
-            height: parent.height
-            radius: 3
-            width: parent.width * Math.min(1, bp.level / 100)
-            color: Theme.blue
-          }
-
-          Rectangle {
-            width: 12
-            height: 12
-            radius: 6
-            color: Theme.fg
-            anchors.verticalCenter: parent.verticalCenter
-            x: Math.max(0, Math.min(parent.width - width,
-                 parent.width * (bp.level / 100) - width / 2))
-          }
+          height: 16
+          value: bp.level
+          step: 5
+          segments: 20            // 0,5,…,100
+          overThreshold: -1       // brightness never runs "over"
         }
 
         MouseArea {

@@ -38,8 +38,7 @@ PanelWindow {
 
   function maxVol() { return sys ? sys.maxVolume : 100 }
   function volIcon() {
-    if (sys && sys.muted) return "󰝟"
-    if (vp.level <= 0) return "󰕿"
+    if ((sys && sys.muted) || vp.level <= 0) return "󰝟"   // zero volume reads as muted
     if (vp.level <= 50) return "󰖀"
     return "󰕾"
   }
@@ -142,40 +141,14 @@ PanelWindow {
         width: parent.width
         height: 18
 
-        Rectangle {
-          id: track
+        SegmentBar {
           anchors.verticalCenter: parent.verticalCenter
           width: parent.width
-          height: 6
-          radius: 3
-          color: Theme.dim
-
-          // 100% reference tick (only meaningful when cap exceeds 100)
-          Rectangle {
-            visible: vp.maxVol() > 100
-            width: 1
-            height: 12
-            color: Theme.muted
-            anchors.verticalCenter: parent.verticalCenter
-            x: parent.width * (100 / vp.maxVol())
-          }
-
-          Rectangle {
-            height: parent.height
-            radius: 3
-            width: parent.width * Math.min(1, vp.level / vp.maxVol())
-            color: vp.level > 100 ? Theme.amber : Theme.blue
-          }
-
-          Rectangle {
-            width: 12
-            height: 12
-            radius: 6
-            color: Theme.fg
-            anchors.verticalCenter: parent.verticalCenter
-            x: Math.max(0, Math.min(parent.width - width,
-                 parent.width * (vp.level / vp.maxVol()) - width / 2))
-          }
+          height: 16
+          value: vp.level
+          step: 5
+          segments: Math.round(vp.maxVol() / 5)   // 30 segments at a 150 cap
+          overThreshold: vp.maxVol() > 100 ? 100 : -1
         }
 
         MouseArea {

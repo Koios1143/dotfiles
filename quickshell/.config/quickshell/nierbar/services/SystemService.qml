@@ -102,6 +102,19 @@ Item {
     if (_sink && _sink.audio) _sink.audio.muted = !_sink.audio.muted
   }
 
+  // Raising the volume while muted lifts the mute. Handled reactively on the
+  // live sink volume so it fires for every source — the XF86 keys (wpctl),
+  // the scroll wheel and the sliders alike. Lowering keeps the mute; the
+  // initial read (_prevVol < 0) only seeds the baseline.
+  property int _prevVol: -1
+  onVolumeChanged: {
+    var v = parseInt(root.volume)
+    if (isNaN(v)) return
+    if (_prevVol >= 0 && root.muted && v > _prevVol && _sink && _sink.audio)
+      _sink.audio.muted = false
+    _prevVol = v
+  }
+
   // brightnessctl writes trigger a backlight `change` udev event, which drives
   // the re-read below — no explicit refresh needed here.
   // Linear, no floor (can reach raw 0), matching the XF86 keyboard binds so

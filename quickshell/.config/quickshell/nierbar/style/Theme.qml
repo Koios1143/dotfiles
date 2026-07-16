@@ -23,6 +23,7 @@ QtObject {
   readonly property color red: "#d06050"
   readonly property color blue: "#6d8fd6"
   readonly property color green: "#8fae6a"
+  readonly property color white: "#dddddd"
 
   readonly property int itemHeight: 34
   readonly property int itemRadius: 1

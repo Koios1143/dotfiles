@@ -67,8 +67,7 @@ PanelWindow {
 
   // icon thresholds mirror SystemCluster / the popups (nier-bar consistency)
   function volIcon() {
-    if (osd.sys && osd.sys.muted) return "󰝟"
-    if (osd.level <= 0) return "󰕿"
+    if ((osd.sys && osd.sys.muted) || osd.level <= 0) return "󰝟"   // zero volume reads as muted
     if (osd.level <= 50) return "󰖀"
     return "󰕾"
   }
@@ -168,38 +167,17 @@ PanelWindow {
         font.pixelSize: 12
       }
 
-      Item {
+      SegmentBar {
         anchors.left: ic.right
         anchors.leftMargin: 12
         anchors.right: pct.left
         anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
-        height: 6
-
-        Rectangle {
-          id: track
-          anchors.fill: parent
-          radius: 3
-          color: Theme.dim
-
-          // 100% reference tick (only meaningful when the cap exceeds 100)
-          Rectangle {
-            visible: osd.mode === "volume" && osd.maxLevel > 100
-            width: 1
-            height: 12
-            color: Theme.muted
-            anchors.verticalCenter: parent.verticalCenter
-            x: parent.width * (100 / osd.maxLevel)
-          }
-
-          Rectangle {
-            height: parent.height
-            radius: 3
-            width: parent.width * Math.max(0, Math.min(1, osd.level / osd.maxLevel))
-            color: (osd.mode === "volume" && osd.level > 100) ? Theme.amber : Theme.blue
-            Behavior on width { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
-          }
-        }
+        height: 16
+        value: osd.level
+        step: 5
+        segments: Math.round(osd.maxLevel / 5)   // 30 for volume (150), 20 for brightness (100)
+        overThreshold: (osd.mode === "volume" && osd.maxLevel > 100) ? 100 : -1
       }
     }
   }
