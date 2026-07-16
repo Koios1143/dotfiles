@@ -136,13 +136,6 @@ Row {
 
   Divider {}
 
-  StatusItem { label: "CPU\n" + root.pct(sys.cpu); minWidth: 42; tooltip: "CPU " + root.pct(sys.cpu); onLeftClick: () => Quickshell.execDetached(["sh", "-c", "missioncenter || resources || btop || true"]) }
-  Divider {}
-  StatusItem { label: "GPU\n" + root.pct(sys.gpu); minWidth: 42; tooltip: "GPU " + root.pct(sys.gpu); onLeftClick: () => Quickshell.execDetached(["sh", "-c", "missioncenter || resources || btop || true"]) }
-  Divider {}
-  StatusItem { label: "RAM\n" + root.pct(sys.ram); minWidth: 42; tooltip: "RAM " + root.pct(sys.ram); onLeftClick: () => Quickshell.execDetached(["sh", "-c", "missioncenter || resources || btop || true"]) }
-  Divider {}
-
   StatusItem {
     icon: root.batteryIcon()
     label: root.pct(sys.battery)
