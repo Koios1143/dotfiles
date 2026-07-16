@@ -135,18 +135,6 @@ Row {
 
   Divider {}
 
-  StatusItem {
-    id: netItem
-    icon: root.networkIcon()
-    label: ""
-    fg: root.networkColor()
-    tooltip: root.networkTip()
-    minWidth: 24
-    onLeftClick: () => { if (root.onNetworkClick) root.onNetworkClick(netItem.mapToItem(null, 0, 0).x, netItem.width) }
-  }
-
-  Divider {}
-
   StatusItem { label: "CPU\n" + root.pct(sys.cpu); minWidth: 42; tooltip: "CPU " + root.pct(sys.cpu); onLeftClick: () => Quickshell.execDetached(["sh", "-c", "missioncenter || resources || btop || true"]) }
   Divider {}
   StatusItem { label: "GPU\n" + root.pct(sys.gpu); minWidth: 42; tooltip: "GPU " + root.pct(sys.gpu); onLeftClick: () => Quickshell.execDetached(["sh", "-c", "missioncenter || resources || btop || true"]) }
@@ -179,6 +167,18 @@ Row {
   Divider {}
 
   StatusItem {
+    id: netItem
+    icon: root.networkIcon()
+    label: ""
+    fg: root.networkColor()
+    tooltip: root.networkTip()
+    minWidth: 24
+    onLeftClick: () => { if (root.onNetworkClick) root.onNetworkClick(netItem.mapToItem(null, 0, 0).x, netItem.width) }
+  }
+
+  Divider {}
+
+  StatusItem {
     id: btItem
     icon: root.bluetoothIcon()
     label: ""
@@ -189,11 +189,11 @@ Row {
     onLeftClick: () => { if (root.onBluetoothClick) root.onBluetoothClick(btItem.mapToItem(null, 0, 0).x, btItem.width) }
   }
 
-  StatusItem {
-    icon: "󰌌"
-    label: ""
-    tooltip: sys.keyboard
-    compact: true
-    minWidth: 22
+  // system tray sits at the far right; the divider hides with it when empty
+  Divider { visible: tray.visible }
+
+  SystemTray {
+    id: tray
+    anchors.verticalCenter: parent.verticalCenter
   }
 }

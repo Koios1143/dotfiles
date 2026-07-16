@@ -56,8 +56,12 @@ For GPU usage:
 ```text
 [left]  workspaces + focused window
 [center] time / date, absolute centered
-[right] volume brightness network cpu gpu ram battery bluetooth keyboard
+[right] volume brightness cpu gpu ram battery power network bluetooth [system tray]
 ```
+
+The system tray (`components/SystemTray.qml`) sits at the far right and only
+appears when at least one StatusNotifierItem app is registered; its leading
+divider hides with it.
 
 The clock is anchored with `anchors.horizontalCenter`, so it stays centered regardless of left/right content width.
 
@@ -73,8 +77,12 @@ The clock is anchored with `anchors.horizontalCenter`, so it stays centered rega
 | Network | connection type | none | open NetworkManager editor / nmtui |
 | CPU/GPU/RAM | usage | none | open monitor fallback |
 | Battery | percentage + remaining time | none | open power settings fallback |
+| Power profile | current profile | none | cycle performance/balanced/power-saver |
 | Bluetooth | state | none | open bluetooth manager fallback |
-| Keyboard | keyboard label | none | none |
+| System tray | per-item tooltip | scroll forwarded to item | activate item (menu-only items open their menu) |
+
+System tray items also respond to middle click (secondary activate) and right
+click (open the item's context menu).
 
 ## Customization
 
@@ -83,11 +91,21 @@ Edit these files:
 - `style/Theme.qml`: colors, sizes, font, compactness
 - `components/WorkspaceStrip.qml`: `workspaceCount`
 - `components/SystemCluster.qml`: command fallbacks and status item behavior
+- `components/SystemTray.qml`: which tray applets show — `hidden` (blocklist of
+  SNI ids) and `allowed` (if non-empty, allow-list only those ids). Ids are
+  case-sensitive; find one by hovering (tooltip) or `busctl --user get-property
+  <svc> <path> org.kde.StatusNotifierItem Id`. Network/bluetooth are hidden by
+  default since they already have dedicated bar items.
 - `scripts/system_state.sh`: metrics backend
 
 ## Notes
 
 The bar intentionally avoids SSID / WiFi signal text in the visible bar. Network only displays one icon: WiFi, wired, or disconnected.
+
+`shell.qml` starts with `//@ pragma UseQApplication`. This is required for system
+tray items to display their native context menus (right click); without it
+Quickshell logs `Cannot display PlatformMenuEntry ...`. Changing this pragma
+needs a full quickshell restart — a hot reload does not pick it up.
 
 
 ## fix2 note
