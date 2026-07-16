@@ -18,6 +18,9 @@ Item {
   property bool busy: false
   property string status: ""
 
+  // set true while a popup is showing the list so it keeps re-scanning
+  property bool polling: false
+
   // ---- hotspot (AP mode sharing the wired/other connection) ----
   property bool hotspotActive: false
   property string hotspotDevice: ""       // iface the AP runs on (for client lookup)
@@ -194,6 +197,17 @@ Item {
   }
 
   Component.onCompleted: refresh()
+
+  // While a popup is open, keep the scan list fresh. NetworkManager also does
+  // its own background scans, so a periodic rescan just nudges it and re-lists.
+  // We drive rescanProc directly (not rescan()) to avoid the busy/status flicker
+  // that the manual rescan button intentionally shows.
+  Timer {
+    interval: 12000
+    repeat: true
+    running: root.polling && root.wifiEnabled && !root.hotspotActive
+    onTriggered: rescanProc.running = true
+  }
 
   Process {
     id: radioProc

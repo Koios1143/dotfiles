@@ -38,8 +38,8 @@ PanelWindow {
     pop.hsBand = net.hotspotBand
   }
 
-  function open() { pop.shown = true; net.refresh(); net.rescan(); pop.seedHotspotFields() }
-  function close() { pop.shown = false; pop.pendingSsid = ""; pwField.text = ""; pop.hsShowQr = false }
+  function open() { pop.shown = true; net.polling = true; net.refresh(); net.rescan(); pop.seedHotspotFields() }
+  function close() { pop.shown = false; net.polling = false; pop.pendingSsid = ""; pwField.text = ""; pop.hsShowQr = false }
   function toggle() { pop.shown ? pop.close() : pop.open() }
   function openAt(x, w) { pop.anchorX = x; pop.anchorWidth = w; pop.open() }
   function toggleAt(x, w) { pop.shown ? pop.close() : pop.openAt(x, w) }

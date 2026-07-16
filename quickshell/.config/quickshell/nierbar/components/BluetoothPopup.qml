@@ -24,12 +24,21 @@ PanelWindow {
   property real anchorX: 0
   property real anchorWidth: 0
 
-  function open() { pop.shown = true; bt.refresh() }
+  // start scanning on open so the list keeps discovering devices (the service's
+  // 2.5s timer only refreshes while scanning); close() stops it again.
+  function open() { pop.shown = true; bt.refresh(); if (bt.powered) bt.startScan() }
   function close() { pop.shown = false; bt.stopScan() }
   function openAt(x, w) { pop.anchorX = x; pop.anchorWidth = w; pop.open() }
   function toggleAt(x, w) { pop.shown ? pop.close() : pop.openAt(x, w) }
 
   BluetoothService { id: bt }
+
+  // if the adapter is powered on while the panel is open, begin scanning so
+  // the list starts filling without a second click.
+  Connections {
+    target: bt
+    function onPoweredChanged() { if (pop.shown && bt.powered) bt.startScan() }
+  }
 
   MouseArea {
     anchors.fill: parent

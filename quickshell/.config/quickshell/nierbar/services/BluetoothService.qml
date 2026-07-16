@@ -88,8 +88,16 @@ Item {
     onExited: function (code, st) { root.status = ""; root.refresh() }
   }
 
+  // `bluetoothctl scan on` given as args is one-shot: it enables discovery then
+  // exits, and BlueZ stops the scan the moment that D-Bus client disconnects —
+  // so nothing new is ever found. `--timeout` instead blocks for the duration,
+  // keeping the client (and discovery) alive; killing the process (stopScan)
+  // drops the client and cleanly ends discovery. 3600s comfortably outlasts any
+  // popup session.
   Process {
     id: scanProc
-    command: ["bluetoothctl", "scan", "on"]
+    command: ["bluetoothctl", "--timeout", "3600", "scan", "on"]
+    // if discovery ends on its own (timeout reached), reflect it in the UI
+    onExited: function (code, st) { root.scanning = false }
   }
 }
