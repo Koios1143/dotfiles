@@ -326,8 +326,51 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launche
 hl.bind("ALT + Space", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher calc"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
+
+-- Fullscreen window
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 1 }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = 0 }))
+-- Fullscreen but make sure other floating window still has higher z order
+local BAR = { left = 0, top = 52, right = 0, bottom = 0 }   -- nierbar has 52px, hard coded
+local pmaxed = {}   -- [address] = original status, clear up after config reload
+hl.bind(mainMod .. " + CTRL + F", function()
+      local w = hl.get_active_window()
+      if not w then return end
+      local key = w.address
+      -- Recovery to original stat if had been fullscreen
+      if pmaxed[key] then
+              local s = pmaxed[key]
+              pmaxed[key] = nil
+              if s.floating then
+                      -- if floating, back to original position
+                      hl.dispatch(hl.dsp.window.resize({ x = s.w, y = s.h }))
+                      hl.dispatch(hl.dsp.window.move({ x = s.x, y = s.y, relative = false }))
+		      hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+              else
+		      -- otherwise, let layout handle position and size automatically
+                      hl.dispatch(hl.dsp.window.float({ action = "disable" }))
+              end
+              return
+      end
+      -- record current status
+      pmaxed[key] = { floating = w.floating, x = w.at.x, y = w.at.y, w = w.size.x, h = w.size.y }
+
+      local m = hl.get_active_monitor()
+      local g = hl.get_config("general:gaps_out")            -- { top, right, bottom, left }
+      local lw, lh = m.width / m.scale, m.height / m.scale
+
+      local x  = math.floor(m.x + BAR.left + g.left)
+      local y  = math.floor(m.y + BAR.top  + g.top)
+      local ww = math.floor(lw - BAR.left - BAR.right  - g.left - g.right)
+      local hh = math.floor(lh - BAR.top  - BAR.bottom - g.top  - g.bottom)
+
+      if not w.floating then
+              hl.dispatch(hl.dsp.window.float({ action = "enable" }))
+      end
+      hl.dispatch(hl.dsp.window.resize({ x = ww, y = hh }))
+      hl.dispatch(hl.dsp.window.move({ x = x, y = y, relative = false }))
+      hl.dispatch(hl.dsp.window.alter_zorder({ mode = "bottom" }))
+end)
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -380,6 +423,28 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+hl.bind(mainMod .. " + ALT + mouse:272", hl.dsp.window.resize(), { mouse = true })
+
+-- Resize floating window
+local STEP = 100
+local MIN  = 120
+local function resize_active(d)
+	local w = hl.get_active_window()
+	if not w then return end
+	if not w.floating then return end
+	if w.floating and d < 0 and (w.size.x + d < MIN or w.size.y + d < MIN) then
+		return
+	end
+	hl.dispatch(hl.dsp.window.resize({ x = d, y = d, relative = true, window=w }))
+end
+hl.bind(mainMod .. " + plus",  function() resize_active( STEP) end)
+hl.bind(mainMod .. " + equal", function() resize_active( STEP) end)
+hl.bind(mainMod .. " + minus", function() resize_active(-STEP) end)
+-- Resize any window with mainMod + shift + arrow
+hl.bind(mainMod .. " + SHIFT + up",    hl.dsp.window.resize({ x = 0, y = -20, relative = true }))
+hl.bind(mainMod .. " + SHIFT + down",  hl.dsp.window.resize({ x = 0, y =  20, relative = true }))
+hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.window.resize({ x = -20, y = 0, relative = true }))
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.resize({ x =  20, y = 0, relative = true }))
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
@@ -395,20 +460,15 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
 
--- 框選區域，存檔 + 複製到剪貼簿
--- hl.bind("Print", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
+-- Screenshot selected area, copy and save
 hl.bind("Print", hl.dsp.exec_cmd("grimblast --freeze copysave area " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 hl.bind("ALT + SHIFT + S", hl.dsp.exec_cmd("grimblast --freeze copysave area " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
-
--- 整個螢幕，存檔 + 複製
--- hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grim - | tee ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png | wl-copy"))
+-- Screenshot whole screen, copy and save
 hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grimblast --freeze copysave screen " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
-
--- 目前視窗
-hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copy save active " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
+-- Screenshot active window, copy and save
+hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copysave active " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
 -- Logout menu
--- hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p " .. home .. "/.config/quickshell/powermenu/shell.qml"))
 
 -- color picker
