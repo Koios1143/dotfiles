@@ -414,6 +414,8 @@ end
 
 -- Example special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("hideall"))
+-- hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special("magic"))
+-- hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.window.move({ workspace = "+0" }))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Scroll through existing workspaces with mainMod + scroll
@@ -468,7 +470,7 @@ hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grimblast --freeze copysave scre
 -- Screenshot active window, copy and save
 hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copysave active " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
--- Logout menu
+-- Power menu
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p " .. home .. "/.config/quickshell/powermenu/shell.qml"))
 
 -- color picker

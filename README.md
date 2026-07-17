@@ -1,95 +1,176 @@
 # dotfiles
 
-Arch Linux + Hyprland 環境設定，用 GNU Stow 管理。
+A Nier-style Arch Linux with Hyprland configured by GNU Stow.
 
-## 結構
+> [!CAUTION]
+> This is a personal project (for quick env recovery), not only serve for whole scene setting
+> If you only want the cool tools with customized theme, you may refer to quickshell and hypr (and maybe also other files) for more details
+
+## Project Structure
 
 ```
 dotfiles/
-├── hypr/      .config/hypr/...        ← 每個 app 一個「套件」
-├── waybar/    .config/waybar/...         套件內部鏡射 home 的路徑
-├── wofi/      .config/wofi/...
+├── hypr/      .config/hypr/...
+├── quickshell/    .config/quickshell/...
+├── yazi/      .config/yazi/...
 ├── ...
-├── system/    etc/...                 ← /etc 設定備份（需 root 還原，非 symlink）
-├── pkglist-native.txt                 ← 官方 repo 套件
-├── pkglist-aur.txt                    ← AUR 套件
-├── services-system.txt                ← 啟用的 systemd services
+├── system/    etc/...                 ← /etc settings backup（need recovery with with root permission，instead of symlink）
+├── pkglist-native.txt                 ← official packages
+├── pkglist-aur.txt                    ← AUR packages
+├── services-system.txt                ← activated systemd services
 ├── services-user.txt
 ├── fonts-local.txt
 ├── theme-settings.txt
-├── migrate-to-stow.sh                 ← 首次把現有 config 搬進來
-├── dump.sh                            ← 更新套件/服務/etc 快照
-└── bootstrap.sh                       ← 新機器一鍵還原
+├── migrate-to-stow.sh                 ← Add exists packages' configs into manage
+├── dump.sh                            ← Update packages / services / etc snapshots
+└── bootstrap.sh                       ← Recovery on new machine
 ```
 
-Stow 的運作：在 `dotfiles/` 裡執行 `stow hypr`，會把 `hypr/.config/hypr`
-symlink 到 `~/.config/hypr`。所以套件資料夾內的路徑要「相對 $HOME 鏡射」。
+> Some folder may be deprecated, e.g. waybar
 
-## 首次設定
+> Note: Stow
+> run `stwo hypr` under project root will create symlink to `~/.config/hypr`
+> the path inside the package folder need to be related to $HOME
+
+## About the theme
+
+> I love quickshell lol
+
+- status bar: quickshell
+- app launcher: quickshell
+- paste history: quickshell
+- power menu: quickshell
+- login menu and lockscreen: SDDM + quickshell (modified from qylock nier theme)
+- file manager: dolphin (still in progress)
+
+> TODO: Add some screenshots
+
+### shortcuts
+
+| keybind | functionality |
+| ------- | ------------- |
+| `SUPER` + `Q` | Open Terminal |
+| `SUPER` + `G` | center, float a window with size 800x600 |
+| `SUPER` + `C` | Close window |
+| `SUPER` + `M` | Logout |
+| `SUPER` + `L` | Lock system |
+| `SUPER` + `E` | Open file manager |
+| `SUPER` + `V` | Float window |
+| `SUPER` + `R` | Open app launcher |
+| `ALT` + `Space` | Open calculator |
+| `SUPER` + `P` | Pseudo Window |
+| `SUPER` + `J` | Toggle Split |
+| `SUPER` + `F` | Fullscreen window (with margin and top-level panels) |
+| `SUPER` + `SHIFT` + `F` | Fullscreen window |
+| `SUPER` + `CTRL` + `F` | Fullscreen window but without hovering floating windows |
+| `SUPER` + arrow | Adjust window size |
+| `ALT` + `TAB` | Move focus to next window (cycle) |
+| `ALT` + `SHIFT` + `TAB` | Move focus to previous window (cycle) |
+| `SUPER` + number | Switch to workspace [1-10] |
+| `SUPER` + `S` | Toggle to special workspace |
+| `SUPER` + `SHIFT` + `S` | Move to special workspace magic |
+| `SUPER` + mouse scroll | Scroll trough workspace |
+| `SUPER` + Mouse Left | Drag window |
+| `SUPER` + Mouse Right | Resize window |
+| `SUPER` + `ALT` + Mouse Left | Resize window |
+| `SUPER` + `+`/`-` | Resize floating window |
+| `SUPER` + `SHIFT` + arrow | Resize window |
+| `XF86AudioRaiseVolume` | Raise volume 5% |
+| `XF86AudioLowerVolume` | Lower volume 5% |
+| `XF86AudioMute` | Mute audio output |
+| `XF86AudioMicMute` | Mute microphone |
+| `XF86MonBrightnessUp` | Increase Brightness 5% |
+| `XF86MonBrightnessDown` | Lower Brightness 5% |
+| `XF86AudioNext` | Play next |
+| `XF86AudioPause` | Pause |
+| `XF86AudioPlay` | Play |
+| `XF86AudioPrev` | Play previous |
+| `Print` | Screenshot selected area |
+| `ALT` + `SHITF` + `F` | Screenshot selected are |
+| `SUPER` + `Print` | Screenshot whole monitor |
+| `ALT` + `Print` | Screenshot active window |
+| `SUPER` + `Escape` | Open power menu |
+| `SUPER` + `SHIFT` + `C` | Color picker |
+| `SUPER` + `SHIFT` + `V` | Open clipboard history |
+| `XF86Launch1` | Open Acer Predactor Scene (DAMX), Acer Predactor only |
+
+
+## Quick Start (How to manage your own configuations)
 
 ```bash
 mkdir -p ~/dotfiles
 cd ~/dotfiles
 git init
-cp /path/to/.gitignore .          # 先放好 .gitignore 再開始，避免誤傳 secrets
+cp /path/to/.gitignore .
 
-# 把 script 放進來
 cp /path/to/{migrate-to-stow.sh,dump.sh,bootstrap.sh} .
 chmod +x *.sh
 
-# 1) 先 dry-run，檢視會搬哪些東西、有沒有漏掉的 .config 資料夾
+# 1) dry-run first to check what will be process and if there's anything excluded
 ./migrate-to-stow.sh
 
-# 2) 確認 PACKAGES 清單（編輯 migrate-to-stow.sh 頂端），再正式執行
+# 2) After checking, run with apply flag to actually perform operations
 ./migrate-to-stow.sh --apply
 
-# 3) 記錄套件、服務、/etc 等快照
+# 3) dump will record the packages (from pacman and paru), services status, /etc snapshot...
 ./dump.sh
 
-# 4) 上 git
+# 4) Then you can manage with git now
 git add -A
 git commit -m "initial dotfiles"
 git remote add origin <你的 github repo>
 git push -u origin main
 ```
 
-## 日常使用
+## Daily Usages
 
-config 已經是 symlink，所以照常編輯 `~/.config/hypr/hyprland.conf` 等檔案，
-其實就是在改 repo 裡的檔。改完只要：
+config files are already symlinked, so directly edit files like `~/.config/hypr/hyprland.conf` actually  modified the files in the repo
+
+After that, simple add and commit those modifications
 
 ```bash
 cd ~/dotfiles && git add -A && git commit -m "..." && git push
 ```
 
-裝了新套件、開了新服務之後，重跑 `./dump.sh` 更新快照即可。
+If you installed (or uninstalled) some packages, or if you open (or close) some services, run `./dump.sh` can update the snapshot.
 
-### 新增一個套件
+### Add new config files to managed by Stow
+
+If you have some new packages that also have config files needed to be manage, run the following commands
 
 ```bash
-# 把現有 config 加進 migrate-to-stow.sh 的 PACKAGES，再：
+# Add current config files into PACKAGES in migrate-to-stow.sh, then run the following command
 ./migrate-to-stow.sh --apply
-# 或手動：
+# Or you may perform the operation manually with following commands
 mkdir -p ~/dotfiles/<pkg>/.config
 mv ~/.config/<pkg> ~/dotfiles/<pkg>/.config/<pkg>
 stow <pkg>
 ```
 
-## 在新機器上還原
+## Recovery on new machine
 
 ```bash
-git clone <你的 repo> ~/dotfiles
+git clone <Your repo> ~/dotfiles
 cd ~/dotfiles
-./bootstrap.sh                    # 裝套件 + stow
-# 或一併啟用服務：
+./bootstrap.sh # Install packages and stow
+# Or also adjust the services' status
 ./bootstrap.sh --enable-services
 ```
 
-之後手動處理 `system/`（/etc 設定）與字型，細節見 bootstrap 結尾提示。
+As for the system configuration (such as /etc and fonts), you need to configure manually.
 
-## 注意
+## Note
 
-- **Secrets 不進 repo**：SSH/GPG key、token 等已被 `.gitignore` 排除；
-  仍建議 push 前 `git status` 確認一次。
-- **/etc 設定**需 root，採「備份+手動還原」而非 symlink。
-- 新機器 stow 若遇到 `conflict`，表示該位置已有預設檔，備份或刪除後再 stow。
+- On new machine if some conflicts occurs, that means the config file already exists, you need to backup or remove to stow again
+- Some footnotes and comments are in Mandarin, I'll turn them into English in future
+- The reason why I choose quickshell instead of wofi, rofi, waybar, ... is simply because quickshell provides maximum flexibility
+
+## Acknowledgement
+
+- [Hyprland](https://github.com/hyprwm/hyprland) and [quickshell](https://github.com/quickshell-mirror/quickshell) makes these modifications possible
+- [Qylock](https://github.com/Darkkal44/qylock): The login menu, lockscreen and power menu are essentially modified from the theme `NieR: Automata`
+- [NieR-Cursors](https://github.com/Beinsezii/NieR-Cursors): We also apply this cursor in this theme
+- [Game UI Database](https://www.gameuidatabase.com/gameData.php?id=150&autoload=80452): Give me many inspiration about original NieR UI/UX design
+- [Figma - Nier Automata HomePage](https://www.figma.com/community/file/1173051414761468493/nier-automata-homepage): Give me some materials
+- [Game font library](https://www.gamefontlibrary.com/games/nier%3A-automata): Provide the NieR font
+
