@@ -53,6 +53,7 @@ libreoffice-fresh-zh-tw
 linux
 linux-firmware
 linux-headers
+man-db
 mediainfo
 mission-center
 mpv
