@@ -50,7 +50,7 @@ dotfiles/
 | keybind | functionality |
 | ------- | ------------- |
 | `SUPER` + `Q` | Open Terminal |
-| `SUPER` + `G` | center, float a window with size 800x600 |
+| `SUPER` + `G` | Next new window will be center, float, with window size 800x600 |
 | `SUPER` + `C` | Close window |
 | `SUPER` + `M` | Logout |
 | `SUPER` + `L` | Lock system |
@@ -63,7 +63,7 @@ dotfiles/
 | `SUPER` + `F` | Fullscreen window (with margin and top-level panels) |
 | `SUPER` + `SHIFT` + `F` | Fullscreen window |
 | `SUPER` + `CTRL` + `F` | Fullscreen window but without hovering floating windows |
-| `SUPER` + arrow | Adjust window size |
+| `SUPER` + arrow | Change active window |
 | `ALT` + `TAB` | Move focus to next window (cycle) |
 | `ALT` + `SHIFT` + `TAB` | Move focus to previous window (cycle) |
 | `SUPER` + number | Switch to workspace [1-10] |
@@ -75,6 +75,7 @@ dotfiles/
 | `SUPER` + `ALT` + Mouse Left | Resize window |
 | `SUPER` + `+`/`-` | Resize floating window |
 | `SUPER` + `SHIFT` + arrow | Resize window |
+| `SUPER` + `CTRL` + arrow | Move active window |
 | `XF86AudioRaiseVolume` | Raise volume 5% |
 | `XF86AudioLowerVolume` | Lower volume 5% |
 | `XF86AudioMute` | Mute audio output |
