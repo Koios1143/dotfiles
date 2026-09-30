@@ -46,7 +46,7 @@ dotfiles/
 
 ### Demos
 
-> The demonstration video may take some time to load (webp actually)
+> The demonstration video may take some time to load
 
 ***Powermenu***
 
