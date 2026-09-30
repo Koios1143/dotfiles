@@ -44,7 +44,27 @@ dotfiles/
 - file manager: dolphin (still in progress)
 - traditional chinese input method: McBopomofo
 
-> TODO: Add some screenshots
+### Demos
+
+> The demonstration video may take some time to load (webp actually)
+
+***Powermenu***
+<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/71b67f56-caf0-49d8-a44d-cda91e6061f8" />
+
+***Lock screen***
+<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/8a930128-4b5a-49a8-a029-1f891c938b4a" />
+
+***Clipboard***
+<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/2e74d090-a9df-43ed-802b-f19d76c72d38" />
+
+***Application launcher***
+<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/7fb3e062-3454-483c-9afb-9484145bced6" />
+
+***NieR bar***
+<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/770a76f4-08c6-45c3-83d7-d514aed4d310" />
+
+***fastfetch & hyprland***
+<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/4e217cdc-c4ba-498d-8a53-078d0be05ad0" />
 
 ### shortcuts
 
