@@ -254,6 +254,19 @@ hl.config({
     },
 })
 
+-----------------
+----  CURSOR ----
+-----------------
+
+-- Force hardware cursors so the cursor lives on its own plane and is NOT
+-- composited into the framebuffer. Otherwise grim/grimblast captures the
+-- cursor in every screenshot even without the -c flag.
+hl.config({
+    cursor = {
+        no_hardware_cursors = false,
+    },
+})
+
 
 ---------------
 ---- INPUT ----
@@ -543,6 +556,12 @@ hl.window_rule({
 -- })
 -- overlayLayerRule:set_enabled(false)
 hl.layer_rule({ match = { namespace = "swaync-notification-window" }, blur = false })
+
+-- Disable the fade animation on slurp's "selection" layer. grimblast tries to
+-- set this at runtime (`hyprctl keyword layerrule ...`) to remove the black
+-- frame seen around area screenshots, but that command is rejected by the
+-- lua config parser, so we set it permanently here instead.
+hl.layer_rule({ match = { namespace = "^selection$" }, no_anim = true })
 
 -- Hyprland-run windowrule
 hl.window_rule({
