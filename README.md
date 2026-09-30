@@ -49,22 +49,28 @@ dotfiles/
 > The demonstration video may take some time to load (webp actually)
 
 ***Powermenu***
-<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/71b67f56-caf0-49d8-a44d-cda91e6061f8" />
+
+https://github.com/user-attachments/assets/275b7f47-cfaf-4721-9b60-b8f798781382
 
 ***Lock screen***
-<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/8a930128-4b5a-49a8-a029-1f891c938b4a" />
+
+https://github.com/user-attachments/assets/efcdf857-9168-4462-8c82-dc5a57744d36
 
 ***Clipboard***
-<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/2e74d090-a9df-43ed-802b-f19d76c72d38" />
+
+https://github.com/user-attachments/assets/9679046e-3d5d-4eac-a3ad-11efa400df0e
 
 ***Application launcher***
-<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/7fb3e062-3454-483c-9afb-9484145bced6" />
+
+https://github.com/user-attachments/assets/608e562e-4158-41f3-a389-0dec230fbbe8
 
 ***NieR bar***
-<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/770a76f4-08c6-45c3-83d7-d514aed4d310" />
+
+https://github.com/user-attachments/assets/f4814506-d760-4172-99cb-be48d9cc333a
 
 ***fastfetch & hyprland***
-<img width="960" height="540" alt="Image" src="https://github.com/user-attachments/assets/4e217cdc-c4ba-498d-8a53-078d0be05ad0" />
+
+https://github.com/user-attachments/assets/cd226020-c0c9-4390-9a17-7978eef2f185
 
 ### shortcuts
 
