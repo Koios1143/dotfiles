@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Chakra+Petch:wght@300;400;500&display=swap" />
+<style>
+  body { margin: 0; background: #08070a; }
+  a { color: #cfc8ba; }
+  a:hover { color: #fff8e8; }
+  @keyframes yorhaScan { 0% { transform: translateY(0); } 100% { transform: translateY(6px); } }
+</style>
+</helmet>
+
+<div style="width: {{ screenW }}px; height: {{ screenH }}px; containerType: size; position: relative; overflow: hidden; background: #0c0a08; color: #cfc8ba; fontFamily: 'IBM Plex Mono', ui-monospace, monospace; fontWeight: 200; userSelect: none">
+
+  <div style="position: absolute; inset: 0; background: radial-gradient(120% 90% at 30% 40%, rgba(70,58,44,0.20), rgba(0,0,0,0) 70%)"></div>
+  <div style="position: absolute; inset: 0; opacity: {{ gridOpacity }}; backgroundImage: linear-gradient(to right, rgba(207,200,186,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(207,200,186,0.07) 1px, transparent 1px), linear-gradient(to right, rgba(207,200,186,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(207,200,186,0.03) 1px, transparent 1px); backgroundSize: 5.2cqh 5.2cqh, 5.2cqh 5.2cqh, 1.3cqh 1.3cqh, 1.3cqh 1.3cqh"></div>
+  <div style="position: absolute; inset: 0; opacity: {{ crtOpacity }}; backgroundImage: repeating-linear-gradient(to bottom, rgba(0,0,0,0.30) 0px, rgba(0,0,0,0.30) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 3px)"></div>
+  <div style="position: absolute; inset: -20%; opacity: {{ noiseOpacity }}; backgroundImage: url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.55'/></svg>&quot;)"></div>
+
+  <div style="position: absolute; left: 3cqh; right: 3cqh; top: 3cqh; height: 1px; background: linear-gradient(90deg, transparent, rgba(207,200,186,0.28) 4%, rgba(207,200,186,0.28) 70%, transparent 78%, transparent 84%, rgba(207,200,186,0.28) 88%, rgba(207,200,186,0.28) 96%, transparent)"></div>
+  <div style="position: absolute; left: 3cqh; right: 3cqh; bottom: 3cqh; height: 1px; background: linear-gradient(90deg, transparent, rgba(207,200,186,0.28) 4%, rgba(207,200,186,0.28) 96%, transparent)"></div>
+  <div style="position: absolute; left: 3cqh; top: 3cqh; bottom: 3cqh; width: 1px; background: linear-gradient(180deg, rgba(207,200,186,0.28), rgba(207,200,186,0.28) 30%, transparent 38%, transparent 48%, rgba(207,200,186,0.28) 56%, rgba(207,200,186,0.28) 100%)"></div>
+  <div style="position: absolute; right: 3cqh; top: 3cqh; bottom: 3cqh; width: 1px; background: linear-gradient(180deg, rgba(207,200,186,0.28), rgba(207,200,186,0.28) 46%, transparent 54%, transparent 62%, rgba(207,200,186,0.28) 70%, rgba(207,200,186,0.28) 100%)"></div>
+
+  <div style="position: absolute; left: 2.2cqh; top: 2.2cqh; width: 2.4cqh; height: 2.4cqh; borderLeft: 1px solid rgba(207,200,186,0.55); borderTop: 1px solid rgba(207,200,186,0.55)"></div>
+  <div style="position: absolute; right: 2.2cqh; top: 2.2cqh; width: 2.4cqh; height: 2.4cqh; borderRight: 1px solid rgba(207,200,186,0.55); borderTop: 1px solid rgba(207,200,186,0.55)"></div>
+  <div style="position: absolute; left: 2.2cqh; bottom: 2.2cqh; width: 2.4cqh; height: 2.4cqh; borderLeft: 1px solid rgba(207,200,186,0.55); borderBottom: 1px solid rgba(207,200,186,0.55)"></div>
+  <div style="position: absolute; right: 2.2cqh; bottom: 2.2cqh; width: 2.4cqh; height: 2.4cqh; borderRight: 1px solid rgba(207,200,186,0.55); borderBottom: 1px solid rgba(207,200,186,0.55)"></div>
+
+  <div style="position: absolute; left: 4.6cqh; top: 32cqh; width: 0.8cqh; height: 26cqh; backgroundImage: repeating-linear-gradient(to bottom, rgba(207,200,186,0.30) 0px, rgba(207,200,186,0.30) 1px, transparent 1px, transparent 5px)"></div>
+  <div style="position: absolute; right: 4.6cqh; top: 24cqh; width: 0.8cqh; height: 20cqh; backgroundImage: repeating-linear-gradient(to bottom, rgba(207,200,186,0.24) 0px, rgba(207,200,186,0.24) 1px, transparent 1px, transparent 5px)"></div>
+  <div style="position: absolute; left: 4.2cqh; top: 66cqh; fontSize: 1.1cqh; letterSpacing: 0.22em; color: rgba(207,200,186,0.30); writingMode: vertical-rl">YRH-001</div>
+  <div style="position: absolute; right: 4.2cqh; top: 26cqh; fontSize: 1.1cqh; letterSpacing: 0.22em; color: rgba(207,200,186,0.26); writingMode: vertical-rl">E-11.02.4-4.3-R</div>
+
+  <div style="position: absolute; left: 4.6cqh; top: 21cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.30)">+</div>
+  <div style="position: absolute; right: 4.6cqh; top: 21cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.30)">+</div>
+  <div style="position: absolute; left: 4.6cqh; top: 75cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.30)">+</div>
+  <div style="position: absolute; right: 4.6cqh; top: 75cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.30)">+</div>
+  <div style="position: absolute; left: 53%; top: 26cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.26)">+</div>
+  <div style="position: absolute; left: 53%; top: 75cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.26)">+</div>
+  <div style="position: absolute; left: 47%; top: 4.4cqh; fontSize: 1.4cqh; color: rgba(207,200,186,0.26)">+</div>
+  <div style="position: absolute; left: 24%; top: 5.2cqh; width: 5cqh; height: 0.5cqh; backgroundImage: repeating-linear-gradient(to right, rgba(207,200,186,0.30) 0px, rgba(207,200,186,0.30) 2px, transparent 2px, transparent 6px)"></div>
+  <div style="position: absolute; left: 49.5%; top: 5.6cqh; width: 28cqh; height: 1px; backgroundImage: repeating-linear-gradient(to right, rgba(207,200,186,0.26) 0px, rgba(207,200,186,0.26) 3px, transparent 3px, transparent 9px)"></div>
+  <div style="position: absolute; right: 21cqh; top: 5cqh; fontSize: 1.1cqh; letterSpacing: 0.24em; color: rgba(207,200,186,0.34)">SYS-BOOT-CTRL</div>
+  <div style="position: absolute; right: 8cqh; bottom: 18cqh; textAlign: right; display: flex; flexDirection: column; alignItems: flex-end; gap: 0.6cqh">
+    <div style="display: flex; gap: 1.4cqh">
+      <div style="width: 6cqh; height: 0.6cqh; backgroundImage: repeating-linear-gradient(to right, rgba(207,200,186,0.34) 0px, rgba(207,200,186,0.34) 3px, transparent 3px, transparent 7px)"></div>
+      <div style="width: 6cqh; height: 0.6cqh; backgroundImage: repeating-linear-gradient(to right, rgba(207,200,186,0.5) 0px, rgba(207,200,186,0.5) 3px, transparent 3px, transparent 7px)"></div>
+    </div>
+    <div style="fontSize: 1.2cqh; letterSpacing: 0.2em; color: rgba(207,200,186,0.42)">EID_22-107-FA</div>
+  </div>
+
+  <div style="position: absolute; right: 7.6cqh; top: 4.2cqh; width: 16cqh; height: 16cqh">
+    <div style="position: absolute; inset: 0; display: flex; flexDirection: column; alignItems: center; justifyContent: center; gap: 0.2cqh">
+      <div style="fontFamily: 'Chakra Petch', 'IBM Plex Mono', monospace; fontSize: 4.8cqh; fontWeight: 400; letterSpacing: 0.04em; color: #f3ecdd; textShadow: 0 0 1.4cqh rgba(240,230,210,0.35); lineHeight: 1">{{ secs }}</div>
+      <div style="fontSize: 1.25cqh; letterSpacing: 0.34em; color: rgba(207,200,186,0.62)">SEC</div>
+    </div>
+  </div>
+
+  <div style="position: absolute; inset: 5.4cqh 7.6cqh 5cqh 7.2cqh; display: flex; flexDirection: column">
+
+    <div style="display: flex; alignItems: flex-start; gap: 2.6cqh">
+      <img src="uploads/yorha.svg" alt="YoRHa" style="height: 10.6cqh; width: auto; opacity: 0.62; marginTop: 0.6cqh" />
+      <div style="display: flex; flexDirection: column; gap: 0.5cqh">
+        <div style="fontSize: 1.4cqh; letterSpacing: 0.3em; color: rgba(207,200,186,0.72)">VER.{{ version }}</div>
+        <div style="fontSize: 3.7cqh; fontWeight: 600; letterSpacing: 0.28em; color: rgba(207,200,186,0.72); textShadow: 0 0 1.2cqh rgba(240,230,210,0.10); lineHeight: 1.1">SYSTEM BOOT MANAGER</div>
+        <div style="fontSize: 1.85cqh; fontWeight: 300; letterSpacing: 0.16em; color: rgba(207,200,186,0.82)">YoRHa BOOT CONTROL INTERFACE</div>
+        <div style="display: flex; alignItems: center; gap: 1.2cqh; marginTop: 0.4cqh">
+          <div style="width: 6.4cqh; height: 0.7cqh; backgroundImage: repeating-linear-gradient(to right, rgba(207,200,186,0.40) 0px, rgba(207,200,186,0.40) 4px, transparent 4px, transparent 8px)"></div>
+          <div style="fontSize: 1.15cqh; letterSpacing: 0.28em; color: rgba(207,200,186,0.40)">SYS-CTRL-INTF</div>
+          <div style="width: 5cqh; height: 1px; backgroundImage: repeating-linear-gradient(to right, rgba(207,200,186,0.34) 0px, rgba(207,200,186,0.34) 3px, transparent 3px, transparent 8px)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="marginTop: auto; display: flex; alignItems: center; justifyContent: center; gap: 2cqh">
+      <div style="fontSize: 2cqh; fontWeight: 300; letterSpacing: 0.14em; color: rgba(207,200,186,0.92)">/// SELECT BOOT TARGET</div>
+      <div style="width: 26cqh; height: 1px; background: linear-gradient(90deg, rgba(207,200,186,0.34), rgba(207,200,186,0.10))"></div>
+    </div>
+
+    <div style="marginTop: 3.4cqh; alignSelf: center; display: flex; flexDirection: column; gap: 1cqh; width: 58cqh">
+
+      <div style="position: relative; height: 7cqh; display: flex; alignItems: center; cursor: pointer" onClick="{{ pick0 }}">
+        <div style="position: absolute; inset: 0; border: 1px solid rgba(230,220,200,0.75); boxShadow: 0 0 1.6cqh rgba(240,228,205,0.16), inset 0 0 2.4cqh rgba(240,228,205,0.05); background: linear-gradient(90deg, rgba(240,228,205,0.05), rgba(240,228,205,0.01)); opacity: {{ frame0 }}">
+          <div style="position: absolute; left: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; left: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 2.6cqh; paddingLeft: 2.6cqh; opacity: {{ text0 }}">
+          <div style="position: relative; width: 1.6cqh; height: 1.6cqh; border: 1px solid currentColor; transform: rotate(45deg)">
+            <div style="position: absolute; inset: 0.32cqh; background: #f2ead9; boxShadow: 0 0 0.8cqh rgba(240,228,205,0.4); opacity: {{ frame0 }}"></div>
+          </div>
+          <div style="fontSize: 2.2cqh; fontWeight: 300; letterSpacing: 0.08em">Arch Linux</div>
+        </div>
+      </div>
+
+      <div style="position: relative; height: 7cqh; display: flex; alignItems: center; cursor: pointer" onClick="{{ pick1 }}">
+        <div style="position: absolute; inset: 0; border: 1px solid rgba(230,220,200,0.75); boxShadow: 0 0 1.6cqh rgba(240,228,205,0.16), inset 0 0 2.4cqh rgba(240,228,205,0.05); background: linear-gradient(90deg, rgba(240,228,205,0.05), rgba(240,228,205,0.01)); opacity: {{ frame1 }}">
+          <div style="position: absolute; left: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; left: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 2.6cqh; paddingLeft: 2.6cqh; opacity: {{ text1 }}">
+          <div style="position: relative; width: 1.6cqh; height: 1.6cqh; border: 1px solid currentColor; transform: rotate(45deg)">
+            <div style="position: absolute; inset: 0.32cqh; background: #f2ead9; boxShadow: 0 0 0.8cqh rgba(240,228,205,0.4); opacity: {{ frame1 }}"></div>
+          </div>
+          <div style="fontSize: 2.2cqh; fontWeight: 300; letterSpacing: 0.08em">Advanced options for Arch Linux</div>
+        </div>
+      </div>
+
+      <div style="position: relative; height: 7cqh; display: flex; alignItems: center; cursor: pointer" onClick="{{ pick2 }}">
+        <div style="position: absolute; inset: 0; border: 1px solid rgba(230,220,200,0.75); boxShadow: 0 0 1.6cqh rgba(240,228,205,0.16), inset 0 0 2.4cqh rgba(240,228,205,0.05); background: linear-gradient(90deg, rgba(240,228,205,0.05), rgba(240,228,205,0.01)); opacity: {{ frame2 }}">
+          <div style="position: absolute; left: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; left: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 2.6cqh; paddingLeft: 2.6cqh; opacity: {{ text2 }}">
+          <div style="position: relative; width: 1.6cqh; height: 1.6cqh; border: 1px solid currentColor; transform: rotate(45deg)">
+            <div style="position: absolute; inset: 0.32cqh; background: #f2ead9; boxShadow: 0 0 0.8cqh rgba(240,228,205,0.4); opacity: {{ frame2 }}"></div>
+          </div>
+          <div style="fontSize: 2.2cqh; fontWeight: 300; letterSpacing: 0.08em">Windows Boot Manager</div>
+        </div>
+      </div>
+
+      <div style="position: relative; height: 7cqh; display: flex; alignItems: center; cursor: pointer" onClick="{{ pick3 }}">
+        <div style="position: absolute; inset: 0; border: 1px solid rgba(230,220,200,0.75); boxShadow: 0 0 1.6cqh rgba(240,228,205,0.16), inset 0 0 2.4cqh rgba(240,228,205,0.05); background: linear-gradient(90deg, rgba(240,228,205,0.05), rgba(240,228,205,0.01)); opacity: {{ frame3 }}">
+          <div style="position: absolute; left: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; top: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderTop: 2px solid #f2ead9"></div>
+          <div style="position: absolute; left: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderLeft: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+          <div style="position: absolute; right: -1px; bottom: -1px; width: 1.4cqh; height: 1.4cqh; borderRight: 2px solid #f2ead9; borderBottom: 2px solid #f2ead9"></div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 2.6cqh; paddingLeft: 2.6cqh; opacity: {{ text3 }}">
+          <div style="position: relative; width: 1.6cqh; height: 1.6cqh; border: 1px solid currentColor; transform: rotate(45deg)">
+            <div style="position: absolute; inset: 0.32cqh; background: #f2ead9; boxShadow: 0 0 0.8cqh rgba(240,228,205,0.4); opacity: {{ frame3 }}"></div>
+          </div>
+          <div style="fontSize: 2.2cqh; fontWeight: 300; letterSpacing: 0.08em">UEFI Firmware Settings</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="marginTop: 3.6cqh; marginBottom: auto; alignSelf: center; width: 58cqh; display: flex; flexDirection: column; gap: 1.6cqh">
+      <div style="height: 0.9cqh; borderTop: 1px solid rgba(207,200,186,0.24); borderLeft: 1px solid rgba(207,200,186,0.24); borderRight: 1px solid rgba(207,200,186,0.24)"></div>
+      <div style="fontSize: 1.35cqh; letterSpacing: 0.22em; color: rgba(207,200,186,0.44); paddingLeft: 1.4cqh">DEFAULT TARGET&nbsp;&nbsp;/&nbsp;&nbsp;{{ defaultTargetLabel }}</div>
+    </div>
+
+    <div style="marginTop: auto; marginBottom: 2.8cqh; position: relative; height: 1px; background: linear-gradient(90deg, rgba(207,200,186,0.32), rgba(207,200,186,0.32) 88%, rgba(207,200,186,0.10))">
+      <div style="position: absolute; left: 0; top: -0.5cqh; width: 1px; height: 1.6cqh; background: rgba(207,200,186,0.42)"></div>
+      <div style="position: absolute; right: 0; top: -0.5cqh; width: 1px; height: 1.6cqh; background: rgba(207,200,186,0.42)"></div>
+    </div>
+
+    <div style="display: flex; alignItems: flex-end; justifyContent: space-between">
+      <div style="fontSize: 1.15cqh; letterSpacing: 0.24em; color: rgba(207,200,186,0.30)">YORHA SYSTEMS // BOOT CONTROL v{{ version }}</div>
+      <div style="display: flex; alignItems: center; gap: 3.2cqh">
+        <div style="display: flex; alignItems: center; gap: 1.2cqh">
+          <div style="minWidth: 6.4cqh; padding: 0.5cqh 0.9cqh; border: 1px solid rgba(207,200,186,0.55); fontSize: 1.4cqh; letterSpacing: 0.14em; textAlign: center; color: rgba(207,200,186,0.9)">ENTER</div>
+          <div style="fontSize: 1.55cqh; letterSpacing: 0.1em; color: rgba(207,200,186,0.78)">CONFIRM</div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 1.2cqh">
+          <div style="display: flex; gap: 0.5cqh">
+            <div style="width: 2.6cqh; padding: 0.5cqh 0; border: 1px solid rgba(207,200,186,0.55); fontSize: 1.4cqh; textAlign: center; color: rgba(207,200,186,0.9)">↑</div>
+            <div style="width: 2.6cqh; padding: 0.5cqh 0; border: 1px solid rgba(207,200,186,0.55); fontSize: 1.4cqh; textAlign: center; color: rgba(207,200,186,0.9)">↓</div>
+          </div>
+          <div style="fontSize: 1.55cqh; letterSpacing: 0.1em; color: rgba(207,200,186,0.78)">SELECT</div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 1.2cqh">
+          <div style="width: 2.6cqh; padding: 0.5cqh 0; border: 1px solid rgba(207,200,186,0.55); fontSize: 1.4cqh; textAlign: center; color: rgba(207,200,186,0.9)">E</div>
+          <div style="fontSize: 1.55cqh; letterSpacing: 0.1em; color: rgba(207,200,186,0.78)">OPTIONS</div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 1.2cqh">
+          <div style="width: 2.6cqh; padding: 0.5cqh 0; border: 1px solid rgba(207,200,186,0.55); fontSize: 1.4cqh; textAlign: center; color: rgba(207,200,186,0.9)">C</div>
+          <div style="fontSize: 1.55cqh; letterSpacing: 0.1em; color: rgba(207,200,186,0.78)">CMD-LINE</div>
+        </div>
+        <div style="display: flex; alignItems: center; gap: 1.2cqh">
+          <div style="minWidth: 4.6cqh; padding: 0.5cqh 0.9cqh; border: 1px solid rgba(207,200,186,0.55); fontSize: 1.4cqh; letterSpacing: 0.14em; textAlign: center; color: rgba(207,200,186,0.9)">ESC</div>
+          <div style="fontSize: 1.55cqh; letterSpacing: 0.1em; color: rgba(207,200,186,0.78)">BACK</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1920, &quot;height&quot;: 1080 },
+  &quot;resolution&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;1920 x 1080&quot;, &quot;2560 x 1440&quot;, &quot;1600 x 1200&quot;, &quot;1366 x 768&quot;, &quot;1280 x 1024&quot;, &quot;1280 x 720&quot;, &quot;1024 x 768&quot;, &quot;800 x 600&quot;, &quot;640 x 480&quot;, &quot;Custom&quot;], &quot;default&quot;: &quot;1920 x 1080&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Screen&quot; },
+  &quot;customWidth&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 1920, &quot;min&quot;: 320, &quot;max&quot;: 3840, &quot;unit&quot;: &quot;px&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Screen&quot; },
+  &quot;customHeight&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 1080, &quot;min&quot;: 240, &quot;max&quot;: 2160, &quot;unit&quot;: &quot;px&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Screen&quot; },
+  &quot;timeoutSeconds&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 8, &quot;min&quot;: 1, &quot;max&quot;: 60, &quot;unit&quot;: &quot;s&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Behavior&quot; },
+  &quot;version&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;2.12.8&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Content&quot; },
+  &quot;defaultTargetLabel&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;ARCH LINUX&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Content&quot; },
+  &quot;showGrid&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Effects&quot; },
+  &quot;crtEffects&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Effects&quot; },
+  &quot;dimOpacity&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 0.5, &quot;min&quot;: 0.25, &quot;max&quot;: 0.8, &quot;step&quot;: 0.05, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Effects&quot; }
+}">
+class Component extends DCLogic {
+  state = { sel: 0, secs: null, running: true };
+
+  get timeout() { return this.props.timeoutSeconds ?? 8; }
+  get entryCount() { return 4; }
+
+  componentDidMount() {
+    this.tick = setInterval(() => {
+      if (!this.state.running) return;
+      this.setState(s => {
+        const cur = s.secs == null ? this.timeout : s.secs;
+        return { secs: cur > 0 ? cur - 1 : this.timeout };
+      });
+    }, 1000);
+    this.onKey = e => {
+      const n = this.entryCount;
+      if (e.key === 'ArrowDown') { this.setState(s => ({ sel: (s.sel + 1) % n, running: false })); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { this.setState(s => ({ sel: (s.sel + n - 1) % n, running: false })); e.preventDefault(); }
+      else if (e.key === 'Enter' || e.key === 'Escape') { this.setState({ running: false }); }
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.tick);
+    window.removeEventListener('keydown', this.onKey);
+  }
+
+  resolution() {
+    const preset = this.props.resolution ?? '1920 x 1080';
+    if (preset === 'Custom') return [this.props.customWidth ?? 1920, this.props.customHeight ?? 1080];
+    const m = preset.match(/(\d+)\s*x\s*(\d+)/);
+    return m ? [+m[1], +m[2]] : [1920, 1080];
+  }
+
+  renderVals() {
+    const [w, h] = this.resolution();
+    const secs = this.state.secs == null ? this.timeout : this.state.secs;
+    const C = 2 * Math.PI * 46;
+    const frac = Math.max(0, Math.min(1, secs / Math.max(this.timeout, 1)));
+    const dim = this.props.dimOpacity ?? 0.5;
+    const vals = {
+      screenW: w, screenH: h, ringOffset: (C * (1 - frac)).toFixed(2),
+      secs: String(secs).padStart(2, '0'),
+      version: this.props.version ?? '2.12.8',
+      defaultTargetLabel: this.props.defaultTargetLabel ?? 'ARCH LINUX',
+      gridOpacity: this.props.showGrid === false ? 0 : 1,
+      crtOpacity: this.props.crtEffects === false ? 0 : 0.55,
+      noiseOpacity: this.props.crtEffects === false ? 0 : 0.035
+    };
+    for (let i = 0; i < this.entryCount; i++) {
+      vals['frame' + i] = this.state.sel === i ? 1 : 0;
+      vals['text' + i] = this.state.sel === i ? 1 : dim;
+      vals['pick' + i] = () => this.setState({ sel: i, running: false });
+    }
+    return vals;
+  }
+}
+</script>
+</body>
+</html>

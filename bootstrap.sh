@@ -73,7 +73,9 @@ shopt -s nullglob
 for d in */; do
   name="${d%/}"
   case "$name" in
-    .git|system|scripts) continue ;;
+    # grub/ 不是 stow package：它是 GRUB 主題的產生器 + 產物，
+    # 用 grub/install.sh 裝到 /boot/grub/themes，不進 $HOME。
+    .git|system|scripts|assets|grub) continue ;;
   esac
   if stow -d "$DOTFILES_DIR" -t "$HOME" "$name" 2>/dev/null; then
     echo "  [stow] $name"

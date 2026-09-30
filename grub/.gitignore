@@ -1,0 +1,4 @@
+# 產物與下載物都可由 ./build.sh 重現，不進 repo。
+dist/
+vendor/
+__pycache__/
