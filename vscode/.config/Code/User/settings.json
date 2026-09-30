@@ -2,6 +2,8 @@
     "workbench.colorTheme": "Tokyo Night Storm",
     "editor.unicodeHighlight.nonBasicASCII": false,
     "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.mouseWheelScrollSensitivity": 1.0,
+    "workbench.list.mouseWheelScrollSensitivity": 1.0,
     "terminal.integrated.defaultProfile.linux": "zsh",
     "terminal.integrated.profiles.linux": {
         "bash": {
@@ -14,5 +16,6 @@
             "path": "/usr/bin/tmux"
         }
     },
-    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', 'YoRHa Symbols'"
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', 'YoRHa Symbols'",
+    "hediet.vscode-drawio.resizeImages": null
 }
