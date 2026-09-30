@@ -338,6 +338,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("dolphin"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher toggle"))
 hl.bind("ALT + Space", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher calc"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs -c nierbar ipc call musicEffect toggle"))  -- toggle nierbar music effect
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + K", hl.dsp.layout("swapsplit"))

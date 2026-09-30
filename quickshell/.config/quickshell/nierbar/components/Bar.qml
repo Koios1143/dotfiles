@@ -13,6 +13,8 @@ PanelWindow {
 
   // shared SystemService (created in shell.qml so popups can use it too)
   property var sys
+  // shared MusicEffectService (created in shell.qml, one for all screens)
+  property var music
   // forwarded from shell.qml so icons can toggle their popups
   property var onNetworkClick: null
   property var onVolumeClick: null
@@ -36,14 +38,13 @@ PanelWindow {
     onHeightChanged: requestPaint()
     Component.onCompleted: requestPaint()
 
-    // slow glow-breath: the whole HUD frame dims and swells back like a low idle
-    // pulse. Animating opacity (not repainting the Canvas) keeps it cheap.
-    SequentialAnimation on opacity {
-      loops: Animation.Infinite
-      running: true
-      NumberAnimation { from: 0.55; to: 1.0;  duration: 900;  easing.type: Easing.InOutSine }
-      NumberAnimation { from: 1.0;  to: 0.55; duration: 1300; easing.type: Easing.InOutSine }
-    }
+    // calm idle breath, shared from MusicEffectService, drives BOTH the frame
+    // opacity and the corner-tick length — in every mode (music no longer
+    // touches the frame). Repaint as it moves so the corner ticks animate; the
+    // rest of the outline geometry is static.
+    property real breath: bar.music ? bar.music.idleBreath : 0
+    onBreathChanged: requestPaint()
+    opacity: 0.55 + 0.45 * (bar.music ? bar.music.idleBreath : 1)
 
     onPaint: {
       const ctx = getContext("2d")
@@ -51,7 +52,9 @@ PanelWindow {
       const W = width, H = height
       const m = 3      // inset from the bar edge
       const c = 12     // chamfer (corner cut) length
-      const c2 = 5     // small accent tick length
+      // accent ticks breathe in/out, but stay a clear gap short of the chamfer
+      // (c) so they never collide with the corner — an "air wall" at ~c-4.
+      const c2 = 4 + 4 * frame.breath   // range 4..8, always inside the chamfer
 
       ctx.strokeStyle = Theme.fg
       ctx.lineWidth = 1
@@ -134,6 +137,7 @@ PanelWindow {
       id: centerClock
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.verticalCenter: parent.verticalCenter
+      music: bar.music
       onClockClick: bar.onClockClick
     }
 

@@ -8,11 +8,16 @@ Item {
 
   property date now: new Date()
   property var onClockClick: null
+  // shared MusicEffectService (from Bar). When it's active the side decorations
+  // become audio visualisers; otherwise they show the calm breathing tick.
+  property var music
+  readonly property bool viz: !!(root.music && root.music.active)
 
-  // shared breathing phase: eases out to 1, then slowly settles back to 0,
-  // forever. Both side ticks read it so they inhale/exhale in sync.
-  property real breath: 0
-  SequentialAnimation on breath {
+  // calm breathing phase the side ticks read when not visualising. Follows the
+  // shared idle pulse, falling back to a local one if the service isn't wired up.
+  readonly property real breath: root.music ? root.music.idleBreath : root.idleBreath
+  property real idleBreath: 0
+  SequentialAnimation on idleBreath {
     loops: Animation.Infinite
     running: true
     NumberAnimation { from: 0; to: 1; duration: 900;  easing.type: Easing.InOutSine }
@@ -66,6 +71,42 @@ Item {
     }
   }
 
+  // audio visualiser that replaces a side tick while music plays: a row of bars
+  // fed by cava. Each bar grows symmetrically UP and DOWN from the centre line
+  // (mirror style) instead of only upward. `flip` mirrors bar order so the
+  // lowest band sits nearest the clock on both sides.
+  component AudioViz: Row {
+    id: viz
+    property bool flip: false
+    property var levels: (root.music && root.music.bars) ? root.music.bars : []
+    property int count: 12
+    spacing: 2
+    height: 26
+    layoutDirection: viz.flip ? Qt.LeftToRight : Qt.RightToLeft
+
+    Repeater {
+      model: viz.count
+      delegate: Item {
+        id: cell
+        required property int index
+        width: 3
+        height: viz.height
+        readonly property real lvl: cell.index < viz.levels.length ? viz.levels[cell.index] : 0
+
+        Rectangle {
+          anchors.verticalCenter: parent.verticalCenter   // mirror around centre
+          width: parent.width
+          height: Math.max(2, viz.height * cell.lvl)       // total height, centred
+          radius: 1
+          // tinted with the track art's dominant colour; fades on track change
+          color: root.music ? root.music.accentColor : Theme.line
+          Behavior on color { ColorAnimation { duration: 400 } }
+          Behavior on height { NumberAnimation { duration: 70; easing.type: Easing.OutSine } }
+        }
+      }
+    }
+  }
+
   Column {
     id: clockBlock
     anchors.centerIn: parent
@@ -89,17 +130,43 @@ Item {
     }
   }
 
+  // --- left side: breathing tick <-> visualiser (cross-faded on music mode) --
   BreatheTick {
     flip: false
     anchors.right: clockBlock.left
     anchors.rightMargin: 14
     anchors.verticalCenter: clockBlock.verticalCenter
+    opacity: root.viz ? 0 : 1
+    visible: opacity > 0.01
+    Behavior on opacity { NumberAnimation { duration: 220 } }
+  }
+  AudioViz {
+    flip: false
+    anchors.right: clockBlock.left
+    anchors.rightMargin: 14
+    anchors.verticalCenter: clockBlock.verticalCenter
+    opacity: root.viz ? 1 : 0
+    visible: opacity > 0.01
+    Behavior on opacity { NumberAnimation { duration: 220 } }
   }
 
+  // --- right side ------------------------------------------------------------
   BreatheTick {
     flip: true
     anchors.left: clockBlock.right
     anchors.leftMargin: 14
     anchors.verticalCenter: clockBlock.verticalCenter
+    opacity: root.viz ? 0 : 1
+    visible: opacity > 0.01
+    Behavior on opacity { NumberAnimation { duration: 220 } }
+  }
+  AudioViz {
+    flip: true
+    anchors.left: clockBlock.right
+    anchors.leftMargin: 14
+    anchors.verticalCenter: clockBlock.verticalCenter
+    opacity: root.viz ? 1 : 0
+    visible: opacity > 0.01
+    Behavior on opacity { NumberAnimation { duration: 220 } }
   }
 }
