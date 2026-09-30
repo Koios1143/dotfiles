@@ -23,6 +23,11 @@ PanelWindow {
 
   property string pendingSsid: ""
 
+  // ---- WPA-Enterprise (802.1X) prompt state ----
+  property string pendingEapSsid: ""   // ssid awaiting account + password
+  property bool eapShowPw: false       // reveal the password field (eye toggle)
+  property string eapMethod: "peap"    // selected EAP method ("peap" / "ttls")
+
   // ---- hotspot panel UI state ----
   property bool hsShowPw: false    // reveal the password field (eye toggle)
   property bool hsShowQr: false    // show the join QR instead of the client list
@@ -39,23 +44,67 @@ PanelWindow {
   }
 
   function open() { pop.shown = true; net.polling = true; net.refresh(); net.rescan(); pop.seedHotspotFields() }
-  function close() { pop.shown = false; net.polling = false; pop.pendingSsid = ""; pwField.text = ""; pop.hsShowQr = false }
+  function close() {
+    pop.shown = false
+    net.polling = false
+    pop.pendingSsid = ""
+    pwField.text = ""
+    pop.clearEnterprise()
+    pop.hsShowQr = false
+  }
   function toggle() { pop.shown ? pop.close() : pop.open() }
   function openAt(x, w) { pop.anchorX = x; pop.anchorWidth = w; pop.open() }
   function toggleAt(x, w) { pop.shown ? pop.close() : pop.openAt(x, w) }
 
   function promptPassword(ssid) {
+    pop.clearEnterprise()
     pop.pendingSsid = ssid
     pwField.text = ""
     pwField.forceActiveFocus()
   }
 
+  // 802.1X needs an account as well as a password, so it gets its own panel
+  function promptEnterprise(ssid) {
+    pop.pendingSsid = ""
+    pwField.text = ""
+    // switching to a different SSID starts from scratch; re-prompting the same
+    // one (a rejected password) keeps the account that was already typed
+    if (pop.pendingEapSsid !== ssid) {
+      eapUserField.text = ""
+      pop.eapMethod = "peap"
+    }
+    pop.pendingEapSsid = ssid
+    eapPwField.text = ""
+    if (eapUserField.text.length > 0) eapPwField.forceActiveFocus()
+    else eapUserField.forceActiveFocus()
+  }
+
+  function clearEnterprise() {
+    pop.pendingEapSsid = ""
+    eapUserField.text = ""
+    eapPwField.text = ""
+    pop.eapShowPw = false
+  }
+
+  function submitEnterprise() {
+    if (eapUserField.text.length === 0) { eapUserField.forceActiveFocus(); return }
+    if (eapPwField.text.length === 0) { eapPwField.forceActiveFocus(); return }
+    net.connectEnterprise(pop.pendingEapSsid, eapUserField.text, eapPwField.text,
+                          pop.eapMethod, "mschapv2")
+    // drop the secret from the UI but leave the panel up: if authentication is
+    // rejected the account is still there to retry with. onEnterpriseDone
+    // tears the panel down once the connection actually succeeds.
+    eapPwField.text = ""
+    pop.eapShowPw = false
+  }
+
   function rowClicked(n) {
     if (n.inUse) { net.disconnectFrom(n.ssid); return }
     // secured + never connected before → ask; otherwise let NM use its stored
-    // secret (with a password-prompt fallback via net.needsPassword).
+    // secret (with a prompt fallback via net.needsPassword / needsEnterprise).
     if (n.security && n.security.length > 0 && !net.isSaved(n.ssid)) {
-      pop.promptPassword(n.ssid)
+      if (net.isEnterprise(n.security)) pop.promptEnterprise(n.ssid)
+      else pop.promptPassword(n.ssid)
     } else {
       net.connectTo(n.ssid, "")
     }
@@ -95,6 +144,8 @@ PanelWindow {
   NetworkService {
     id: net
     onNeedsPassword: ssid => { if (pop.shown) pop.promptPassword(ssid) }
+    onNeedsEnterprise: ssid => { if (pop.shown) pop.promptEnterprise(ssid) }
+    onEnterpriseDone: (ok, ssid) => { if (ok && pop.pendingEapSsid === ssid) pop.clearEnterprise() }
   }
 
   // the hotspot status arrives asynchronously after open(); reseed the fields
@@ -492,6 +543,206 @@ PanelWindow {
               hoverEnabled: true
               cursorShape: Qt.PointingHandCursor
               onClicked: { pop.pendingSsid = ""; pwField.text = "" }
+            }
+          }
+        }
+      }
+
+      // ---- inline account + password entry for WPA-Enterprise (802.1X) ----
+      Rectangle {
+        visible: pop.pendingEapSsid.length > 0
+        width: parent.width
+        height: 1
+        color: Theme.dim
+      }
+
+      Column {
+        visible: pop.pendingEapSsid.length > 0
+        width: parent.width
+        spacing: 6
+
+        Text {
+          width: parent.width
+          elide: Text.ElideRight
+          text: "Enterprise · " + pop.pendingEapSsid
+          color: Theme.fg
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.smallText
+        }
+
+        // ---- account (identity) ----
+        Text {
+          text: "Account"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+        }
+        Rectangle {
+          width: parent.width
+          height: 26
+          color: Theme.bgAlt
+          border.color: eapUserField.activeFocus ? Theme.line : Theme.dim
+          border.width: 1
+
+          TextInput {
+            id: eapUserField
+            anchors.fill: parent
+            anchors.leftMargin: 6
+            anchors.rightMargin: 6
+            verticalAlignment: TextInput.AlignVCenter
+            color: Theme.fg
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.smallText
+            clip: true
+            KeyNavigation.tab: eapPwField
+            // enter moves on to the password rather than submitting a half-filled form
+            onAccepted: eapPwField.forceActiveFocus()
+            Keys.onEscapePressed: pop.clearEnterprise()
+          }
+
+          // some networks want user@realm, so hint it while the field is empty
+          Text {
+            anchors.left: parent.left
+            anchors.leftMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            visible: eapUserField.text.length === 0 && !eapUserField.activeFocus
+            text: "user or user@realm"
+            color: Theme.dim
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.smallText
+          }
+        }
+
+        // ---- password (with reveal toggle, hidden by default) ----
+        Text {
+          text: "Password"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+        }
+        Rectangle {
+          width: parent.width
+          height: 26
+          color: Theme.bgAlt
+          border.color: eapPwField.activeFocus ? Theme.line : Theme.dim
+          border.width: 1
+
+          TextInput {
+            id: eapPwField
+            anchors.left: parent.left
+            anchors.right: eapEyeBtn.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 6
+            anchors.rightMargin: 6
+            height: parent.height
+            verticalAlignment: TextInput.AlignVCenter
+            color: Theme.fg
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.smallText
+            echoMode: pop.eapShowPw ? TextInput.Normal : TextInput.Password
+            clip: true
+            KeyNavigation.tab: eapUserField
+            onAccepted: pop.submitEnterprise()
+            Keys.onEscapePressed: pop.clearEnterprise()
+          }
+
+          Text {
+            id: eapEyeBtn
+            anchors.right: parent.right
+            anchors.rightMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            text: pop.eapShowPw ? "󰈈" : "󰈉"      // open eye = shown, eye-off = hidden
+            color: pop.eapShowPw ? Theme.blue : Theme.muted
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.iconText
+            MouseArea {
+              anchors.fill: parent
+              anchors.margins: -4
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.eapShowPw = !pop.eapShowPw
+            }
+          }
+        }
+
+        // ---- EAP method: peap covers campus/eduroam, ttls is the other common one ----
+        Text {
+          text: "EAP method"
+          color: Theme.muted
+          font.family: Theme.fontFamily
+          font.pixelSize: Theme.tinyText
+        }
+        Row {
+          width: parent.width
+          spacing: 6
+
+          Repeater {
+            model: [{ id: "peap", label: "PEAP" }, { id: "ttls", label: "TTLS" }]
+            delegate: Rectangle {
+              required property var modelData
+              readonly property bool sel: pop.eapMethod === modelData.id
+              width: (parent.width - 6) / 2
+              height: 26
+              color: sel ? Theme.activeBg : "transparent"
+              border.color: sel ? Theme.activeBg : Theme.dim
+              border.width: 1
+              Text {
+                anchors.centerIn: parent
+                text: modelData.label
+                color: parent.sel ? Theme.activeFg : Theme.fg
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.smallText
+              }
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: pop.eapMethod = modelData.id
+              }
+            }
+          }
+        }
+
+        Row {
+          width: parent.width
+          spacing: 6
+          layoutDirection: Qt.RightToLeft
+
+          Rectangle {
+            width: 84; height: 24
+            color: eapConnMouse.containsMouse ? Theme.activeBg : "transparent"
+            border.color: Theme.line; border.width: 1
+            Text {
+              anchors.centerIn: parent
+              text: "Connect"
+              color: eapConnMouse.containsMouse ? Theme.activeFg : Theme.fg
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+            MouseArea {
+              id: eapConnMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.submitEnterprise()
+            }
+          }
+
+          Rectangle {
+            width: 72; height: 24
+            color: eapCancelMouse.containsMouse ? Theme.bgAlt : "transparent"
+            border.color: Theme.dim; border.width: 1
+            Text {
+              anchors.centerIn: parent
+              text: "Cancel"
+              color: Theme.muted
+              font.family: Theme.fontFamily
+              font.pixelSize: Theme.smallText
+            }
+            MouseArea {
+              id: eapCancelMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: pop.clearEnterprise()
             }
           }
         }

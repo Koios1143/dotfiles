@@ -8,6 +8,7 @@ Item {
   id: root
 
   property string scriptPath: Quickshell.shellDir + "/scripts/hotspot.sh"
+  property string eapScriptPath: Quickshell.shellDir + "/scripts/wifi_enterprise.sh"
 
   property bool wifiEnabled: true
   property var networks: []        // [{ ssid, signal, security, inUse }]
@@ -33,6 +34,11 @@ Item {
 
   // raised when a passwordless connect fails because a secret is required
   signal needsPassword(string ssid)
+  // same, but the network is WPA-Enterprise so an account is needed too
+  signal needsEnterprise(string ssid)
+  // outcome of a connectEnterprise() attempt, so the popup knows whether to
+  // keep its panel open (wrong password → let the account stand and retry)
+  signal enterpriseDone(bool ok, string ssid)
 
   // last connect attempt, so onExited knows whether to fall back to a prompt
   property string _lastSsid: ""
@@ -40,6 +46,17 @@ Item {
 
   // a stored profile means NetworkManager already has the secret
   function isSaved(ssid) { return root.savedConnections.indexOf(ssid) !== -1 }
+
+  // nmcli reports enterprise APs as e.g. "WPA2 802.1X" / "WPA3 802.1X".
+  // These need an account + password, not just a pre-shared key.
+  function isEnterprise(security) { return /802\.?1x/i.test("" + (security || "")) }
+
+  // security string of a scanned SSID, "" if it is not in the current list
+  function securityOf(ssid) {
+    for (var i = 0; i < root.networks.length; i++)
+      if (root.networks[i].ssid === ssid) return root.networks[i].security
+    return ""
+  }
 
   function refresh() {
     radioProc.running = true
@@ -150,6 +167,21 @@ Item {
       args.push("password", password)
     connectProc.command = args
     connectProc.running = true
+  }
+
+  // `nmcli device wifi connect` can only carry a PSK, so 802.1X goes through
+  // the helper script, which builds a full profile then activates it. The
+  // credentials travel in the environment so they stay out of argv.
+  function connectEnterprise(ssid, identity, password, eap, phase2) {
+    root.busy = true
+    root.status = "Connecting to " + ssid + "…"
+    root._lastSsid = ssid
+    root._lastHadPassword = true
+    eapProc.command = [root.eapScriptPath, "connect", ssid,
+                       eap || "peap", phase2 || "mschapv2"]
+    eapProc.environment = ({ "NIERBAR_EAP_IDENTITY": identity,
+                             "NIERBAR_EAP_PASSWORD": password })
+    eapProc.running = true
   }
 
   function disconnectFrom(ssid) {
@@ -263,12 +295,31 @@ Item {
         var err = ("" + connErr.text).trim()
         // a passwordless attempt that needs a secret → ask for the password
         if (!root._lastHadPassword && /secret|password|key|802[._-]?1x/i.test(err)) {
-          root.status = "Password required"
-          root.needsPassword(root._lastSsid)
+          if (root.isEnterprise(root.securityOf(root._lastSsid))) {
+            root.status = "Account required"
+            root.needsEnterprise(root._lastSsid)
+          } else {
+            root.status = "Password required"
+            root.needsPassword(root._lastSsid)
+          }
         } else {
           root.status = err || "Connection failed"
         }
       }
+      root.refresh()
+    }
+  }
+
+  Process {
+    id: eapProc
+    stderr: StdioCollector { id: eapErr }
+    onExited: function (code, st) {
+      root.busy = false
+      // clear the credentials out of the Process' env once it has exited
+      eapProc.environment = ({})
+      root.status = (code === 0) ? "Connected"
+                                 : (("" + eapErr.text).trim() || "Connection failed")
+      root.enterpriseDone(code === 0, root._lastSsid)
       root.refresh()
     }
   }
