@@ -495,6 +495,13 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = tr
 hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
 
+-- Laptop lid switch. Suspend-on-close is disabled in logind
+-- (HandleLidSwitch=ignore), so Hyprland owns lid behaviour: on close, disable the
+-- internal panel (screen off, session keeps running); on open, restore eDP-1 with
+-- its native mode from monitors.lua. `locked = true` keeps it firing on the lock screen.
+hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd('hyprctl keyword monitor "eDP-1,disable"'),               { locked = true })
+hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd('hyprctl keyword monitor "eDP-1,1920x1200@165.0,0x0,1.0"'), { locked = true })
+
 -- Screenshot selected area, copy and save
 hl.bind("Print", hl.dsp.exec_cmd("grimblast --freeze copysave area " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 hl.bind("ALT + SHIFT + S", hl.dsp.exec_cmd("grimblast --freeze copysave area " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
