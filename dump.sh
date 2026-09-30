@@ -23,8 +23,10 @@ echo "寫入 $DOTFILES_DIR ..."
 # -Qqe：只列「主動安裝」的（排除被當依賴拉進來的）
 # -n：官方 repo  /  -m：foreign（AUR、手動裝的）
 pacman -Qqen > pkglist-native.txt
-# paru / paru-debug 是 AUR helper 本身，重現環境時另外裝，這裡排除掉
-pacman -Qqem | grep -vxE 'paru(-debug)?' > pkglist-aur.txt
+# paru 是 AUR helper 本身，重現環境時另外裝，這裡排除掉。
+# *-debug 是 makepkg 順手產生的除錯符號套件，AUR 上不存在，
+# 留著會讓 paru 在 bootstrap 時 target not found 整批失敗，一併排除。
+pacman -Qqem | grep -vxE 'paru|.*-debug' > pkglist-aur.txt
 echo "  [pkg] pkglist-native.txt ($(wc -l < pkglist-native.txt) 個)"
 echo "  [pkg] pkglist-aur.txt ($(wc -l < pkglist-aur.txt) 個)"
 

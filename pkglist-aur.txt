@@ -1,8 +1,12 @@
 envycontrol
+fcitx5-mcbopomofo-git
 gpu-usage-waybar-git
 grimblast-git
+grub2-theme-preview
 hyprshell
 nier-cursors-bin
+notepad++
+sidra-bin
 ttf-meslo-nerd-font-powerlevel10k
 visual-studio-code-bin
 wlogout

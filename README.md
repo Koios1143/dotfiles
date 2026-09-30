@@ -42,6 +42,7 @@ dotfiles/
 - power menu: quickshell
 - login menu and lockscreen: SDDM + quickshell (modified from qylock nier theme)
 - file manager: dolphin (still in progress)
+- traditional chinese input method: McBopomofo
 
 > TODO: Add some screenshots
 
