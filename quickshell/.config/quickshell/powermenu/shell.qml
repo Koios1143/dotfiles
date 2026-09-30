@@ -2,6 +2,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Wayland
+import "nierintro"
 
 ShellRoot {
     id: shell
@@ -25,7 +26,22 @@ PanelWindow {
     id: root
     anchors.fill: parent
     focus: true
-    color:  "#c0bc9e"
+    color: "transparent"          // NierIntro lays the beige down; see below
+
+    // ── OPENING TRANSITION ───────────────────────────────────────────────────
+    // Declared first so it sits under the menu. It stays for the lifetime of
+    // the window: its filled triangles are what the beige background actually
+    // is, and its vignette is what sits between that and the UI.
+    NierIntro {
+        id: intro
+        anchors.fill: parent
+        beige: root.nierBg        // must match, or the handover shows
+        ink: root.nierDark
+        showRails: false          // the menu has its own top/bottom bars
+    }
+
+    // Everything the menu draws rides in on the transition's own beats.
+    readonly property real chromeReveal: intro.railProgress
 
     // Click empty area to dismiss
     MouseArea { anchors.fill: parent; onClicked: Qt.quit() }
@@ -47,7 +63,7 @@ PanelWindow {
     Keys.onReturnPressed: root.runItem(root.sel)
     Keys.onEnterPressed:  root.runItem(root.sel)
     Keys.onEscapePressed: Qt.quit()
-    Component.onCompleted: root.forceActiveFocus()
+    Component.onCompleted: { root.forceActiveFocus(); intro.prepare(); intro.start() }
 
     // Colors
     readonly property color nierBg:        "#c0bc9e"
@@ -86,8 +102,9 @@ PanelWindow {
         }
     }
 
-    Rectangle {
-        anchors.fill: parent; color: root.nierBg
+    Item {
+        anchors.fill: parent
+        opacity: root.chromeReveal
 
         Image {
             anchors.fill: parent
@@ -145,243 +162,280 @@ PanelWindow {
     // ── DATA PANELS ─────────────────────────────────────────────────────────
     
 
-    // Left decorative technical bar
-    Rectangle {
-        anchors.left: parent.left; anchors.leftMargin: 20 * s
-        anchors.top: topBar.bottom; anchors.bottom: botBar.top
-        width: 1; color: root.nierBorder; opacity: 0.3
-    }
+    // Ambient decoration: its own animations drive opacity, so the reveal
+    // has to ride on a wrapper.
+    Item {
+        anchors.fill: parent
+        opacity: root.chromeReveal
 
-    // ── Animated floating data particles ─────────────────────────────────────
-    Repeater {
-        model: 22
-        Item {
-            id: dp
-            property real px:   (index * 63.7) % root.width
-            property real py:   root.height * 0.15 + (index * 41.3) % (root.height * 0.7)
-            property int  dur:  18000 + (index % 7) * 1800
-            property int  del:  (index % 11) * 700
-            property real sz:   1 + (index % 3) * 0.6
+        // Left decorative technical bar
+        Rectangle {
+            // y/height rather than anchors: topBar and botBar are no longer
+            // siblings now that this sits in the reveal wrapper.
+            x: 20 * s
+            y: topBar.height
+            width: 1
+            height: parent.height - topBar.height - botBar.height
+            color: root.nierBorder; opacity: 0.3
+        }
 
-            x: dp.px; y: dp.py
+        // ── Animated floating data particles ─────────────────────────────────────
+        Repeater {
+            model: 22
+            Item {
+                id: dp
+                property real px:   (index * 63.7) % root.width
+                property real py:   root.height * 0.15 + (index * 41.3) % (root.height * 0.7)
+                property int  dur:  18000 + (index % 7) * 1800
+                property int  del:  (index % 11) * 700
+                property real sz:   1 + (index % 3) * 0.6
 
-            SequentialAnimation on y {
-                loops: Animation.Infinite
-                PauseAnimation  { duration: dp.del }
-                NumberAnimation { from: dp.py; to: dp.py - 220; duration: dp.dur; easing.type: Easing.Linear }
-                NumberAnimation { duration: 0; to: dp.py }
-            }
-            SequentialAnimation on opacity {
-                loops: Animation.Infinite
-                PauseAnimation  { duration: dp.del }
-                NumberAnimation { from: 0; to: 0.5;  duration: dp.dur * 0.08 }
-                NumberAnimation { from: 0.5; to: 0.5; duration: dp.dur * 0.72 }
-                NumberAnimation { from: 0.5; to: 0;   duration: dp.dur * 0.20 }
-            }
-            Rectangle {
-                width: dp.sz * s; height: dp.sz * s
-                color: root.nierDot; opacity: 0.6
+                x: dp.px; y: dp.py
+
+                SequentialAnimation on y {
+                    loops: Animation.Infinite
+                    PauseAnimation  { duration: dp.del }
+                    NumberAnimation { from: dp.py; to: dp.py - 220; duration: dp.dur; easing.type: Easing.Linear }
+                    NumberAnimation { duration: 0; to: dp.py }
+                }
+                SequentialAnimation on opacity {
+                    loops: Animation.Infinite
+                    PauseAnimation  { duration: dp.del }
+                    NumberAnimation { from: 0; to: 0.5;  duration: dp.dur * 0.08 }
+                    NumberAnimation { from: 0.5; to: 0.5; duration: dp.dur * 0.72 }
+                    NumberAnimation { from: 0.5; to: 0;   duration: dp.dur * 0.20 }
+                }
+                Rectangle {
+                    width: dp.sz * s; height: dp.sz * s
+                    color: root.nierDot; opacity: 0.6
+                }
             }
         }
-    }
 
-    // ── Horizontal scan dashes ────────────────────────────────────────────────
-    Repeater {
-        model: 5
-        Rectangle {
-            id: sd
-            property real sy:   root.height * 0.18 + index * (root.height * 0.16)
-            property int  dur:  7000 + index * 900
-            property int  del:  index * 500
-            y: sd.sy; width: 55 * s + index * 18; height: 1
-            color: root.nierDot; opacity: 0; x: -width
-            SequentialAnimation on x {
-                loops: Animation.Infinite
-                PauseAnimation  { duration: sd.del }
-                NumberAnimation { from: -sd.width; to: root.width + sd.width; duration: sd.dur; easing.type: Easing.Linear }
-            }
-            SequentialAnimation on opacity {
-                loops: Animation.Infinite
-                PauseAnimation  { duration: sd.del }
-                NumberAnimation { from: 0;    to: 0.3;  duration: 150 }
-                NumberAnimation { from: 0.3;  to: 0.3;  duration: sd.dur - 300 }
-                NumberAnimation { from: 0.3;  to: 0;    duration: 150 }
+        // ── Horizontal scan dashes ────────────────────────────────────────────────
+        Repeater {
+            model: 5
+            Rectangle {
+                id: sd
+                property real sy:   root.height * 0.18 + index * (root.height * 0.16)
+                property int  dur:  7000 + index * 900
+                property int  del:  index * 500
+                y: sd.sy; width: 55 * s + index * 18; height: 1
+                color: root.nierDot; opacity: 0; x: -width
+                SequentialAnimation on x {
+                    loops: Animation.Infinite
+                    PauseAnimation  { duration: sd.del }
+                    NumberAnimation { from: -sd.width; to: root.width + sd.width; duration: sd.dur; easing.type: Easing.Linear }
+                }
+                SequentialAnimation on opacity {
+                    loops: Animation.Infinite
+                    PauseAnimation  { duration: sd.del }
+                    NumberAnimation { from: 0;    to: 0.3;  duration: 150 }
+                    NumberAnimation { from: 0.3;  to: 0.3;  duration: sd.dur - 300 }
+                    NumberAnimation { from: 0.3;  to: 0;    duration: 150 }
+                }
             }
         }
     }
 
     // ── TOP HEADER BAR ───────────────────────────────────────────────────────
-    Rectangle {
+    Item {
         id: topBar
         width: parent.width; height: 40 * s
-        color: root.nierDarker
 
-        // Decorative triangle rows
-        Canvas {
-            anchors.fill: parent
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.clearRect(0, 0, width, height)
-                ctx.fillStyle = "#524e3e"
-                var step = 10 * s
-                var count = Math.floor(width / step)
-                var triSize = 3 * s
-                for (var i = 0; i < count; i++) {
-                    var x = i * step + 2 * s
-                    // top row (downward triangles)
-                    ctx.beginPath()
-                    ctx.moveTo(x, 5 * s)
-                    ctx.lineTo(x + triSize, 5 * s)
-                    ctx.lineTo(x + triSize/2, 5 * s + triSize)
-                    ctx.fill()
+        Item {
+            x: parent.width * (1 - root.chromeReveal)
+            width: parent.width * root.chromeReveal
+            height: parent.height
+            clip: true
+            visible: root.chromeReveal > 0
+
+            Rectangle {
+                id: topBarBody
+                x: -parent.x; width: topBar.width; height: topBar.height
+                color: root.nierDarker
+
+                // Decorative triangle rows
+                Canvas {
+                    anchors.fill: parent
+                    onPaint: {
+                        var ctx = getContext("2d")
+                        ctx.clearRect(0, 0, width, height)
+                        ctx.fillStyle = "#524e3e"
+                        var step = 10 * s
+                        var count = Math.floor(width / step)
+                        var triSize = 3 * s
+                        for (var i = 0; i < count; i++) {
+                            var x = i * step + 2 * s
+                            // top row (downward triangles)
+                            ctx.beginPath()
+                            ctx.moveTo(x, 5 * s)
+                            ctx.lineTo(x + triSize, 5 * s)
+                            ctx.lineTo(x + triSize/2, 5 * s + triSize)
+                            ctx.fill()
                     
-                    // bottom row (upward triangles)
-                    ctx.beginPath()
-                    ctx.moveTo(x, 35 * s)
-                    ctx.lineTo(x + triSize, 35 * s)
-                    ctx.lineTo(x + triSize/2, 35 * s - triSize)
-                    ctx.fill()
-                }
-            }
-        }
-
-        // Tab row
-        Row {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: 10 * s
-            spacing: 0
-
-            Repeater {
-                model: [
-                    { name: "MAP" },
-                    { name: "QUESTS" },
-                    { name: "ITEMS" },
-                    { name: "WEAPONS" },
-                    { name: "LOGIN" },
-                    { name: "INTEL" },
-                    { name: "SYSTEM" }
-                ]
-                Rectangle {
-                    id: tabBtn
-                    property bool isActive: modelData.name === "SYSTEM"
-                    property bool hovered: tMa.containsMouse
-                    width:  tabContent.implicitWidth + 20 * s
-                    height: topBar.height
-                    color:  isActive ? root.nierSelected : (hovered ? "#4a4840" : "transparent")
-                    border.color: (isActive || hovered) ? root.nierBorder : "transparent"
-                    border.width: (isActive || hovered) ? 1 : 0
-                    Behavior on color { ColorAnimation { duration: 150 } }
-
-                    Row {
-                        id: tabContent
-                        anchors.centerIn: parent
-                        spacing: 5 * s
-                        Image {
-                            id: tabIcon
-                            source: shell.themeUrl + "svgs/" + modelData.name.toLowerCase() + ".svg"
-                            sourceSize.height: 14 * s
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
-                            anchors.verticalCenter: parent.verticalCenter
-                            // Tint the flat #ADA895 svg to match the tab state, keeping
-                            // the same hover/active colour logic the text icons had.
-                            layer.enabled: true
-                            layer.effect: ColorOverlay {
-                                color: (tabBtn.isActive || tabBtn.hovered) ? root.nierAccent : root.nierBorder
-                            }
-                        }
-                        Text {
-                            text: modelData.name
-                            font.family: root.fontName; font.pixelSize: 10 * s
-                            font.letterSpacing: 2 * s
-                            color: (tabBtn.isActive || tabBtn.hovered) ? root.nierAccent : root.nierBorder
-                            anchors.verticalCenter: parent.verticalCenter
+                            // bottom row (upward triangles)
+                            ctx.beginPath()
+                            ctx.moveTo(x, 35 * s)
+                            ctx.lineTo(x + triSize, 35 * s)
+                            ctx.lineTo(x + triSize/2, 35 * s - triSize)
+                            ctx.fill()
                         }
                     }
-                    MouseArea { id: tMa; anchors.fill: parent; hoverEnabled: true }
+                }
+
+                // Tab row
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10 * s
+                    spacing: 0
+
+                    Repeater {
+                        model: [
+                            { name: "MAP" },
+                            { name: "QUESTS" },
+                            { name: "ITEMS" },
+                            { name: "WEAPONS" },
+                            { name: "LOGIN" },
+                            { name: "INTEL" },
+                            { name: "SYSTEM" }
+                        ]
+                        Rectangle {
+                            id: tabBtn
+                            property bool isActive: modelData.name === "SYSTEM"
+                            property bool hovered: tMa.containsMouse
+                            width:  tabContent.implicitWidth + 20 * s
+                            height: topBar.height
+                            color:  isActive ? root.nierSelected : (hovered ? "#4a4840" : "transparent")
+                            border.color: (isActive || hovered) ? root.nierBorder : "transparent"
+                            border.width: (isActive || hovered) ? 1 : 0
+                            Behavior on color { ColorAnimation { duration: 150 } }
+
+                            Row {
+                                id: tabContent
+                                anchors.centerIn: parent
+                                spacing: 5 * s
+                                Image {
+                                    id: tabIcon
+                                    source: shell.themeUrl + "svgs/" + modelData.name.toLowerCase() + ".svg"
+                                    sourceSize.height: 14 * s
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    // Tint the flat #ADA895 svg to match the tab state, keeping
+                                    // the same hover/active colour logic the text icons had.
+                                    layer.enabled: true
+                                    layer.effect: ColorOverlay {
+                                        color: (tabBtn.isActive || tabBtn.hovered) ? root.nierAccent : root.nierBorder
+                                    }
+                                }
+                                Text {
+                                    text: modelData.name
+                                    font.family: root.fontName; font.pixelSize: 10 * s
+                                    font.letterSpacing: 2 * s
+                                    color: (tabBtn.isActive || tabBtn.hovered) ? root.nierAccent : root.nierBorder
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            MouseArea { id: tMa; anchors.fill: parent; hoverEnabled: true }
+                        }
+                    }
                 }
             }
         }
     }
 
     // ── BOTTOM STATUS BAR ────────────────────────────────────────────────────
-    Rectangle {
+    Item {
         id: botBar
         width: parent.width; height: 36 * s
         anchors.bottom: parent.bottom
-        color: root.nierDarker
 
-        Canvas {
-            anchors.fill: parent
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.clearRect(0, 0, width, height)
-                ctx.fillStyle = "#524e3e"
-                var step = 10 * s
-                var count = Math.floor(width / step)
-                var triSize = 3 * s
-                for (var i = 0; i < count; i++) {
-                    var x = i * step + 2 * s
-                    // top row
-                    ctx.beginPath()
-                    ctx.moveTo(x, 3 * s)
-                    ctx.lineTo(x + triSize, 3 * s)
-                    ctx.lineTo(x + triSize/2, 3 * s + triSize)
-                    ctx.fill()
+        Item {
+            x: 0
+            width: parent.width * root.chromeReveal
+            height: parent.height
+            clip: true
+            visible: root.chromeReveal > 0
+
+            Rectangle {
+                id: botBarBody
+                x: 0; width: botBar.width; height: botBar.height
+                color: root.nierDarker
+
+                Canvas {
+                    anchors.fill: parent
+                    onPaint: {
+                        var ctx = getContext("2d")
+                        ctx.clearRect(0, 0, width, height)
+                        ctx.fillStyle = "#524e3e"
+                        var step = 10 * s
+                        var count = Math.floor(width / step)
+                        var triSize = 3 * s
+                        for (var i = 0; i < count; i++) {
+                            var x = i * step + 2 * s
+                            // top row
+                            ctx.beginPath()
+                            ctx.moveTo(x, 3 * s)
+                            ctx.lineTo(x + triSize, 3 * s)
+                            ctx.lineTo(x + triSize/2, 3 * s + triSize)
+                            ctx.fill()
                     
-                    // bottom row
-                    ctx.beginPath()
-                    ctx.moveTo(x, 33 * s)
-                    ctx.lineTo(x + triSize, 33 * s)
-                    ctx.lineTo(x + triSize/2, 33 * s - triSize)
-                    ctx.fill()
-                }
-            }
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left; anchors.leftMargin: 14 * s
-            text: root.items[root.sel].desc || ""
-            font.family: root.fontName; font.pixelSize: 11 * s
-            font.letterSpacing: 0.5; color: root.nierAccent
-        }
-
-        // Key hint chips
-        Row {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right; anchors.rightMargin: 14 * s
-            spacing: 12 * s
-
-            Repeater {
-                model: [
-                    { k: "↑↓",    l: "Select"  },
-                    { k: "Enter", l: "Confirm"  },
-                    { k: "Esc",   l: "Back"     }
-                ]
-                Row {
-                    spacing: 4 * s
-                    anchors.verticalCenter: parent.verticalCenter
-                    Rectangle {
-                        height: 15 * s; width: chip.implicitWidth + 8 * s
-                        radius: 4 * s
-                        color: "#2c2a24"
-                        border.color: root.nierBorder; border.width: 1
-                        anchors.verticalCenter: parent.verticalCenter
-                        Text {
-                            id: chip
-                            anchors.centerIn: parent
-                            text: modelData.k
-                            font.family: root.fontName; font.pixelSize: 9 * s
-                            color: root.nierAccent
+                            // bottom row
+                            ctx.beginPath()
+                            ctx.moveTo(x, 33 * s)
+                            ctx.lineTo(x + triSize, 33 * s)
+                            ctx.lineTo(x + triSize/2, 33 * s - triSize)
+                            ctx.fill()
                         }
                     }
-                    Text {
-                        text: modelData.l
-                        font.family: root.fontName; font.pixelSize: 10 * s
-                        color: root.nierBorder
-                        anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left; anchors.leftMargin: 14 * s
+                    text: root.items[root.sel].desc || ""
+                    font.family: root.fontName; font.pixelSize: 11 * s
+                    font.letterSpacing: 0.5; color: root.nierAccent
+                }
+
+                // Key hint chips
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right; anchors.rightMargin: 14 * s
+                    spacing: 12 * s
+
+                    Repeater {
+                        model: [
+                            { k: "↑↓",    l: "Select"  },
+                            { k: "Enter", l: "Confirm"  },
+                            { k: "Esc",   l: "Back"     }
+                        ]
+                        Row {
+                            spacing: 4 * s
+                            anchors.verticalCenter: parent.verticalCenter
+                            Rectangle {
+                                height: 15 * s; width: chip.implicitWidth + 8 * s
+                                radius: 4 * s
+                                color: "#2c2a24"
+                                border.color: root.nierBorder; border.width: 1
+                                anchors.verticalCenter: parent.verticalCenter
+                                Text {
+                                    id: chip
+                                    anchors.centerIn: parent
+                                    text: modelData.k
+                                    font.family: root.fontName; font.pixelSize: 9 * s
+                                    color: root.nierAccent
+                                }
+                            }
+                            Text {
+                                text: modelData.l
+                                font.family: root.fontName; font.pixelSize: 10 * s
+                                color: root.nierBorder
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
                     }
                 }
             }
@@ -397,14 +451,31 @@ PanelWindow {
         anchors.right:  parent.right
         opacity: root.uiOpacity
 
-        Component.onCompleted: SequentialAnimation {
-            PauseAnimation  { duration: 400 }
+        // Started off the transition, at the beat where the footage pops its
+        // tab row in; see NierIntro's timeline.
+        SequentialAnimation {
+            id: reveal
             ParallelAnimation {
                 NumberAnimation { target: root; property: "uiOpacity"; from: 0; to: 1; duration: 1200; easing.type: Easing.OutExpo }
                 NumberAnimation { target: root; property: "panelOffset"; from: 60 * s; to: 0; duration: 1400; easing.type: Easing.OutExpo }
                 NumberAnimation { target: root; property: "brandReveal"; from: 0; to: 1; duration: 1800; easing.type: Easing.OutQuart }
             }
             ScriptAction { script: missionTypewriter.start() }
+        }
+
+        // The footage fills this beat with its tab row popping in; this menu has
+        // no tab row, so the panels start as soon as the bars have landed -
+        // otherwise the middle of the screen sits empty for ~300ms. Switch to
+        // onTabsShownChanged / intro.tabsShown === 1 to follow the original beat.
+        property bool revealStarted: false
+        Connections {
+            target: intro
+            function onRailProgressChanged() {
+                if (!ui.revealStarted && intro.railProgress >= 1) {
+                    ui.revealStarted = true
+                    reveal.start()
+                }
+            }
         }
 
 

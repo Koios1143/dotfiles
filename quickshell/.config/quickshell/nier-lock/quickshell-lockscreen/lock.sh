@@ -31,6 +31,9 @@ fi
 echo "Locking with Quickshell using theme: $QS_THEME"
 echo "Theme path: $QS_THEME_PATH"
 
+# Grab the desktop for the transition to flood over (see the script)
+. "$DIR/capture-backdrop.sh"
+
 # Kill active lockers
 killall -9 hyprlock swaylock wlogout 2>/dev/null || true
 

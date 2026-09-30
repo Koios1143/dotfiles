@@ -37,4 +37,7 @@ echo "Previewing theme: $QS_THEME  (windowed, no lock, no password)"
 echo "Theme path: $QS_THEME_PATH"
 echo "Close with Ctrl+C or your window-close keybind."
 
+# Grab the desktop for the transition to flood over (see the script)
+. "$DIR/capture-backdrop.sh"
+
 quickshell -p "$DIR/lock_shell.qml"

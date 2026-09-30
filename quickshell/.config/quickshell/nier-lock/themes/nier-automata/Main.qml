@@ -15,7 +15,18 @@ Rectangle {
     id: root
     width:  Screen.width
     height: Screen.height
-    color:  "#c0bc9e"
+    color:  transparentBackground ? "transparent" : nierBg
+
+    // Opt-in hooks for the lock shell, which paints its own background and
+    // runs the NieR opening transition over it. Both default to false, so SDDM
+    // - which loads this theme directly - behaves exactly as before.
+    property bool transparentBackground: false
+    property bool externalIntro: false
+    // How many of the seven tabs to show; -1 means all of them, which is what
+    // SDDM gets. The lock shell counts this up one per frame so the tab row
+    // pops in the way the game's does.
+    property int  tabsShown: -1
+    function startReveal() { if (!reveal.running) reveal.start() }
 
     // Colors
     readonly property color nierBg:        "#c0bc9e"
@@ -257,6 +268,7 @@ Rectangle {
                 ]
                 Rectangle {
                     id: tabBtn
+                    visible: root.tabsShown < 0 || index < root.tabsShown
                     property bool isActive: modelData.name === "LOGIN"
                     property bool hovered: tMa.containsMouse
                     width:  tabContent.implicitWidth + 20 * s
@@ -390,8 +402,11 @@ Rectangle {
         anchors.right:  parent.right
         opacity: root.uiOpacity
 
-        Component.onCompleted: SequentialAnimation {
-            PauseAnimation  { duration: 400 }
+        Component.onCompleted: if (!root.externalIntro) reveal.start()
+
+        SequentialAnimation {
+            id: reveal
+            PauseAnimation  { duration: root.externalIntro ? 0 : 400 }
             ParallelAnimation {
                 NumberAnimation { target: root; property: "uiOpacity"; from: 0; to: 1; duration: 1200; easing.type: Easing.OutExpo }
                 NumberAnimation { target: root; property: "panelOffset"; from: 60 * s; to: 0; duration: 1400; easing.type: Easing.OutExpo }
