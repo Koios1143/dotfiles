@@ -27,3 +27,4 @@ fcitx/.config/fcitx/dbus/
 *.swp
 *~
 .DS_Store
+kde/.local/share/icons/hicolor/
