@@ -48,6 +48,7 @@ PACKAGES=(
   ".config/gthumb"
   ".config/hyprshell"
   ".config/pulse"
+  ".config/pipewire"
   ".config/qylock"
   ".config/wlogout"
   ".config/Thunar"
