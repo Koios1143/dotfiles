@@ -23,7 +23,7 @@ dotfiles/
 ├── theme-settings.txt
 ├── migrate-to-stow.sh                 ← Add exists packages' configs into manage
 ├── dump.sh                            ← Update packages / services / etc snapshots
-├── install_0c_ime.sh                  ← Clone my 0c-ime fork (+ upstream remote, fix branch); --install builds and installs it
+├── install_0c_ime.sh                  ← Clone my 0c-ime fork (+ upstream remote); --install builds and installs it
 └── bootstrap.sh                       ← Recovery on new machine
 ```
 
