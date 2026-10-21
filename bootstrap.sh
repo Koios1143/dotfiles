@@ -94,6 +94,8 @@ if [[ -x ./install_git_packages.sh ]]; then
 else
   echo "  找不到 install_git_packages.sh，略過"
 fi
+# 靈犀注音的 fork：只準備 repo，換版要先裝官網套件再跑 ./install_0c_ime.sh --install
+[[ -x ./install_0c_ime.sh ]] && ./install_0c_ime.sh
 
 echo "=== 7/7 services ==="
 if [[ "$ENABLE_SERVICES" -eq 1 ]]; then
@@ -119,4 +121,5 @@ echo "  • /etc 系統設定備份在 system/，檢視後再 sudo cp 回對應�
 echo "  • 自訂字型已透過 fonts/ 這個 stow package symlink 到 ~/.local/share/fonts，執行 fc-cache -f 更新快取"
 echo "  • tpm 裝好後，在 tmux 內按 prefix + I 安裝外掛；p10k 首次啟動會跑設定精靈"
 echo "  • git-packages.extra.txt 裡若有需額外安裝的工具（如 qylock），clone 後依其說明再跑安裝腳本"
+echo "  • 靈犀注音：先裝官網套件 https://0c.biggo.com，再跑 ./install_0c_ime.sh --install 換成 fork 的版本"
 echo "  • 重新登入 / 重開機讓 services 與 session 生效"

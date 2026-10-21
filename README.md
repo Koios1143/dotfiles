@@ -23,6 +23,7 @@ dotfiles/
 ├── theme-settings.txt
 ├── migrate-to-stow.sh                 ← Add exists packages' configs into manage
 ├── dump.sh                            ← Update packages / services / etc snapshots
+├── install_0c_ime.sh                  ← Clone my 0c-ime fork (+ upstream remote, fix branch); --install builds and installs it
 └── bootstrap.sh                       ← Recovery on new machine
 ```
 
@@ -42,7 +43,7 @@ dotfiles/
 - power menu: quickshell
 - login menu and lockscreen: SDDM + quickshell (modified from qylock nier theme)
 - file manager: dolphin (still in progress)
-- traditional chinese input method: McBopomofo
+- traditional chinese input method: 0c-ime (靈犀注音) on fcitx5, built from my fork [Koios1143/0c-ime](https://github.com/Koios1143/0c-ime) (`install_0c_ime.sh`)
 
 ### Demos
 
