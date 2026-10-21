@@ -7,7 +7,7 @@ set -u
 
 tmp="${XDG_RUNTIME_DIR:-/tmp}/gif-record.mp4"
 outdir="$HOME/Pictures/gifs"
-fps=15
+fps=30
 max_width=1280
 
 if pkill -INT -f "wl-screenrec .*$tmp"; then
