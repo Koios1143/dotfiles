@@ -1,4 +1,5 @@
 android-tools
+assimp
 base
 base-devel
 bashtop
@@ -15,6 +16,7 @@ clang
 cliphist
 cmake
 cmatrix
+cuda
 cups
 cups-pk-helper
 discord
@@ -31,9 +33,11 @@ fcitx5-configtool
 fcitx5-gtk
 fcitx5-mozc
 fcitx5-qt
+flameshot
 fontforge
 fzf
 git
+go
 grim
 grub
 grub-btrfs
@@ -47,6 +51,7 @@ hyprpaper
 hyprpicker
 imagemagick
 imv
+intel-media-driver
 intel-ucode
 kdenlive
 kitty
@@ -66,12 +71,15 @@ mission-center
 mpv
 nano
 nasm
+navi
 network-manager-applet
 networkmanager
+nodejs
 noise-suppression-for-voice
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
+npm
 ntfs-3g
 nvidia-open
 nvidia-settings
@@ -79,6 +87,7 @@ nvidia-utils
 nvtop
 nwg-displays
 obs-studio
+openblas
 openssh
 os-prober
 pavucontrol
@@ -93,8 +102,10 @@ plymouth
 polkit-kde-agent
 power-profiles-daemon
 powertop
+pv
 qemu-ui-gtk
 qt5-wayland
+qt6-quick3d
 qt6-wayland
 quickshell
 rclone

@@ -9,5 +9,6 @@ notepad++
 sidra-bin
 ttf-meslo-nerd-font-powerlevel10k
 visual-studio-code-bin
+wl-screenrec
 wlogout
 zen-browser-bin

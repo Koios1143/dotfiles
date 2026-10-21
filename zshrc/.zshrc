@@ -129,5 +129,6 @@ if [[ "$TERM" == "xterm-kitty" ]]; then
 fi
 
 source <(fzf --zsh)
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 export EDITOR=vim
+export LANG=zh_TW.UTF-8

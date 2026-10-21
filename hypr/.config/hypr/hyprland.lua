@@ -74,6 +74,9 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("env -u QT_IM_MODULE qs -c nier-launcher")
 	hl.exec_cmd("qs -c nierbar")
 	hl.exec_cmd("qs -c nier-clipboard")
+	-- Pod assistant: daemon as a systemd user service, UI as its own Quickshell instance
+	hl.exec_cmd("systemctl --user start pod-daemon.service")
+	hl.exec_cmd("env -u QT_IM_MODULE qs -p /home/koios/pod-assistant/ui")
 end)
 
 -------------------------------
@@ -350,9 +353,12 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(home .. "/.config/quickshell/nier-loc
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("dolphin"))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher toggle"))
+hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd("qs -p /home/koios/pod-assistant/ui ipc call pod summon"))  -- summon Pod assistant
 hl.bind("ALT + Space", hl.dsp.exec_cmd("qs -c nier-launcher ipc call launcher calc"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs -c nierbar ipc call musicEffect toggle"))  -- toggle nierbar music effect
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+hl.bind(mainMod .. " + F12", hl.dsp.exec_cmd(home .. "/.local/bin/colorblind"))  -- cycle color-blindness filter
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/gif-record.sh"))  -- toggle region GIF recording
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + K", hl.dsp.layout("swapsplit"))
 hl.bind(mainMod .. " + CTRL + left", hl.dsp.window.swap({ direction = "left" }))
@@ -510,6 +516,9 @@ hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("grimblast --freeze copysave scre
 -- Screenshot active window, copy and save
 hl.bind("ALT + Print", hl.dsp.exec_cmd("grimblast --freeze copysave active " .. home .. "/Pictures/screenshot/screenshot-$(date +%Y%m%d-%H%M%S).png"))
 
+-- Flameshot: drag a box, adjust its edges/size, then Enter to copy (Ctrl+S to save)
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("flameshot gui"))
+
 -- Power menu
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("quickshell -p " .. home .. "/.config/quickshell/powermenu/shell.qml"))
 
@@ -569,6 +578,17 @@ hl.layer_rule({ match = { namespace = "swaync-notification-window" }, blur = fal
 -- frame seen around area screenshots, but that command is rejected by the
 -- lua config parser, so we set it permanently here instead.
 hl.layer_rule({ match = { namespace = "^selection$" }, no_anim = true })
+
+-- Flameshot's capture overlay has to sit exactly over the screen, untiled and unanimated
+hl.window_rule({
+    name  = "flameshot-overlay",
+    match = { class = "^flameshot$" },
+
+    float   = true,
+    move    = "0 0",
+    pin     = true,
+    no_anim = true,
+})
 
 -- Hyprland-run windowrule
 hl.window_rule({
